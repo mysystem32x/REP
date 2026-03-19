@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Respect Home - Недвижимость Турции</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Премиальный шрифт для тайтла -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<header class="main-header">
+    <div class="container header-content">
+        <div class="logo-section">
+            <a href="/" style="text-decoration: none; display: flex; align-items: center;">
+                <img src="/static/images/logo.png" alt="Respect Home" class="main-logo">
+            </a>
+        </div>
+
+        <nav class="desktop-nav">
+            <ul class="nav-menu">
+                <li><a href="/" class="active">Главная</a></li>
+                <li><a href="/properties">Объекты</a></li>
+                <li><a href="/about">О нас</a></li>
+                <li><a href="/contacts">Контакты</a></li>
+                <li><a href="/admin">Панель управления</a></li>
+
+            </ul>
+        </nav>
+
+        <div class="header-actions">
+            <div class="contact-info">
+                <a href="tel:+905559460190" class="phone">+90 554 332 33 96</a>
+            </div>
+            
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </div>
+</header>
+
+<div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+<nav class="mobile-nav" id="mobileNav">
+    <div class="mobile-nav-links">
+        <a href="/" class="nav-link nav-active">Главная</a>
+        <a href="/properties" class="nav-link">Объекты</a>
+        <a href="/about" class="nav-link">О нас</a>
+        <a href="/contacts" class="nav-link">Контакты</a>
+        <a href="/admin" class="nav-link admin-link">Панель управления</a>
+    </div>
+
+    <div class="mobile-contact-info">
+        <p>📞 Связаться</p>
+        <a href="tel:+905559460190">+90 554 332 33 96</a>
+        <p style="margin-top: 15px;">✉️ Почта</p>
+        <a href="mailto:anastasiiainvestor@gmail.com">anastasiiainvestor@gmail.com</a>
+    </div>
+</nav>
+
+<main>
+    <section class="hero-section">
+        <div class="hero-overlay"></div>
+        
+        <div class="container hero-container">
+            <div class="hero-content-wrapper">
+                <span class="hero-badge">Luxury Real Estate Turkey</span>
+                <h1 class="main-hero-title">RESPECT HOME</h1>
+                <p class="hero-subtitle">ВАШЕ ОТРАЖЕНИЕ РОСКОШИ В ТУРЦИИ</p>
+                <div class="hero-divider"></div>
+                <p class="hero-description">
+                    Премиальная недвижимость в лучших локациях: <br>
+                    от пентхаусов на Босфоре до вилл в Бодруме.
+                </p>
+                <div class="hero-actions">
+                    <a href="/properties" class="hero-button gold-glow">СМОТРЕТЬ ОБЪЕКТЫ</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="categories">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Категории недвижимости</h2>
+                <p class="section-subtitle">Выберите категорию, которая вас интересует</p>
+            </div>
+            <div class="categories-grid">
+                {% for category in categories %}
+                <a href="/properties?category={{ category.slug }}" class="category-card">
+                    <div class="category-image-wrapper">
+                        <img src="{{ category.image }}" alt="{{ category.name }}" class="category-image">
+                        <div class="category-overlay"></div>
+                    </div>
+                    <div class="category-info">
+                        <h3 class="category-name">{{ category.name }}</h3>
+                        <span class="category-arrow">→</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="why-us">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Почему выбирают нас</h2>
+            </div>
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon">🏆</div>
+                    <h3>10+ лет опыта</h3>
+                    <p>Более 5000 успешных сделок на рынке недвижимости Турции</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">🌍</div>
+                    <h3>Премиальные локации</h3>
+                    <p>Объекты в самых престижных районах Стамбула и курортов</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">🤝</div>
+                    <h3>Полная поддержка</h3>
+                    <p>Помощь с оформлением документов и получением вида на жительство</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">💼</div>
+                    <h3>Профессиональный сервис</h3>
+                    <p>Команда говорит на 5+ языках и готова помочь 24/7</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Готовы найти свой идеальный дом?</h2>
+                <p>Свяжитесь с нашей командой экспертов прямо сейчас</p>
+                <div class="cta-buttons">
+                    <a href="/contacts" class="cta-button primary">Связаться</a>
+                    <a href="/properties" class="cta-button secondary">Все объекты</a>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <div class="container footer-content">
+        <div class="footer-grid">
+            <div class="footer-section">
+                <h3>Respect Home</h3>
+                <p>Ведущее агентство по недвижимости в Турции</p>
+            </div>
+            <div class="footer-section">
+                <h3>Навигация</h3>
+                <a href="/properties">Объекты</a>
+                <a href="/about">О нас</a>
+                <a href="/contacts">Контакты</a>
+            </div>
+            <div class="footer-section">
+                <h3>Социальные сети</h3>
+                <a href="https://www.tiktok.com/@anastasiia_respect_home?_r=1&_t=ZS-94pAnu3mWdc">TikTok</a>
+                <a href="https://www.instagram.com/respect_home_alanya?igsh=MTg2NmYzODJqOGcycw%3D%3D&utm_source=qr">Instagram</a>
+                <a href="https://api.whatsapp.com/send/?phone=905543323396&text&type=phone_number&app_absent=0">WhatsApp</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p class="copyright">Copyright © 2025 Respect Home</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    (function() {
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const mobileNav = document.getElementById('mobileNav');
+            const mobileNavOverlay = document.getElementById('mobileNavOverlay');
+
+            if (!mobileMenuToggle || !mobileNav || !mobileNavOverlay) {
+                console.log('Элементы меню не найдены');
+                return;
+            }
+
+            function toggleMobileMenu() {
+                mobileMenuToggle.classList.toggle('active');
+                mobileNav.classList.toggle('active');
+                mobileNavOverlay.classList.toggle('active');
+                document.body.classList.toggle('menu-open');
+            }
+
+            function closeMobileMenu() {
+                mobileMenuToggle.classList.remove('active');
+                mobileNav.classList.remove('active');
+                mobileNavOverlay.classList.remove('active');
+                document.body.classList.remove('menu-open');
+            }
+
+            mobileMenuToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleMobileMenu();
+            });
+
+            mobileNavOverlay.addEventListener('click', closeMobileMenu);
+
+            const mobileLinks = mobileNav.querySelectorAll('.nav-link');
+            mobileLinks.forEach(function(link) {
+                link.addEventListener('click', closeMobileMenu);
+            });
+
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 1024) {
+                    closeMobileMenu();
+                }
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeMobileMenu();
+                }
+            });
+
+            // Добавляем анимацию для букв тайтла (опционально)
+            const title = document.querySelector('.main-hero-title');
+            if (title) {
+                const text = title.textContent;
+                const letters = text.split('');
+                title.innerHTML = letters.map((letter, i) => 
+                    `<span style="--i: ${i}">${letter === ' ' ? '&nbsp;' : letter}</span>`
+                ).join('');
+            }
+        });
+    })();
+</script>
+
+</body>
+</html>

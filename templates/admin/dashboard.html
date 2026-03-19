@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Admin Dashboard | DVT GROUP</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* ===== БАЗОВЫЕ СТИЛИ ===== */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #110c09 0%, #1a1a1a 100%);
+            color: #fff;
+            line-height: 1.5;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            background: rgba(17, 12, 9, 0.95);
+            border-bottom: 1px solid rgba(212, 165, 116, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            min-height: 64px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-placeholder {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-box {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #d4a574, #b89061);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            color: #110c09;
+            flex-shrink: 0;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        .logo-text .main-title {
+            font-weight: 600;
+            font-size: 18px;
+            color: #fff;
+        }
+
+        .logo-text .sub-title {
+            font-size: 11px;
+            color: #d4a574;
+            opacity: 0.9;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== МОБИЛЬНОЕ МЕНЮ ===== */
+        .mobile-menu-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 44px;
+            height: 44px;
+            background: rgba(212, 165, 116, 0.9);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            cursor: pointer;
+            padding: 8px;
+            z-index: 10000;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .mobile-menu-toggle:active {
+            transform: scale(0.95);
+        }
+
+        .mobile-menu-toggle span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background: white;
+            margin: 3px 0;
+            border-radius: 3px;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            transform-origin: center;
+        }
+
+        .mobile-menu-toggle.active span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .mobile-menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+
+        .mobile-menu-toggle.active span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        .mobile-nav-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 9998;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .mobile-nav-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: -350px;
+            width: 85%;
+            max-width: 320px;
+            height: 100vh;
+            background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+            z-index: 9999;
+            padding: 80px 24px 30px;
+            overflow-y: auto;
+            box-shadow: -5px 0 30px rgba(0, 0, 0, 0.7);
+        }
+
+        .mobile-nav.active {
+            display: block;
+            right: 0;
+            animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes slideIn {
+            from { right: -350px; }
+            to { right: 0; }
+        }
+
+        .mobile-nav .nav-link {
+            display: block;
+            padding: 16px 0;
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            font-size: 17px;
+            font-weight: 500;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            opacity: 0;
+            transform: translateX(25px);
+            transition: all 0.35s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .mobile-nav.active .nav-link {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .mobile-nav.active .nav-link:nth-child(1) { transition-delay: 0.05s; }
+        .mobile-nav.active .nav-link:nth-child(2) { transition-delay: 0.1s; }
+        .mobile-nav.active .nav-link:nth-child(3) { transition-delay: 0.15s; }
+        .mobile-nav.active .nav-link:nth-child(4) { transition-delay: 0.2s; }
+        .mobile-nav.active .nav-link:nth-child(5) { transition-delay: 0.25s; }
+
+        .mobile-nav .nav-link:hover,
+        .mobile-nav .nav-link.nav-active {
+            color: #d4a574;
+            padding-left: 12px;
+            background: rgba(212, 165, 116, 0.12);
+            border-radius: 8px;
+        }
+
+        .mobile-nav .admin-link {
+            color: #d4a574;
+            margin-top: 16px;
+            font-weight: 600;
+        }
+
+        .mobile-contact-info {
+            margin-top: 28px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s ease 0.3s;
+        }
+
+        .mobile-nav.active .mobile-contact-info {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .mobile-contact-info p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+            margin: 12px 0 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        .mobile-contact-info a {
+            color: #d4a574;
+            text-decoration: none;
+            font-size: 17px;
+            font-weight: 500;
+            display: block;
+            padding: 4px 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .mobile-contact-info a:active {
+            opacity: 0.8;
+        }
+
+        .admin-nav {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .home-link,
+        .admin-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 8px 14px;
+            border-radius: 6px;
+            transition: all 0.25s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .home-link:hover,
+        .admin-nav .nav-link:hover {
+            color: #d4a574;
+            background: rgba(212, 165, 116, 0.1);
+        }
+
+        .admin-nav .nav-link {
+            color: #d4a574;
+            border: 1px solid rgba(212, 165, 116, 0.3);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        main {
+            padding: 24px 0 40px;
+            min-height: calc(100vh - 200px);
+        }
+
+        /* ===== ADMIN HEADER ===== */
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .admin-title {
+            font-size: 26px;
+            color: #d4a574;
+            margin: 0;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+
+        .btn-add {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 12px 22px;
+            background: linear-gradient(135deg, #d4a574, #c49564);
+            color: #110c09;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 14px rgba(212, 165, 116, 0.3);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-add:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 8px rgba(212, 165, 116, 0.3);
+        }
+
+        .btn-add:hover {
+            background: linear-gradient(135deg, #e0b584, #d4a574);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(212, 165, 116, 0.4);
+        }
+
+        /* ===== DESKTOP TABLE ===== */
+        .properties-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .properties-table th {
+            background: rgba(212, 165, 116, 0.15);
+            color: #d4a574;
+            font-weight: 600;
+            padding: 16px 14px;
+            text-align: left;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .properties-table td {
+            padding: 16px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .properties-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .properties-table tr:hover {
+            background: rgba(212, 165, 116, 0.06);
+        }
+
+        .properties-table .price-cell {
+            font-weight: 600;
+            color: #d4a574;
+            font-size: 15px;
+        }
+
+        .properties-table .type-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(212, 165, 116, 0.15);
+            color: #d4a574;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-edit,
+        .btn-delete {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            min-width: 85px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-edit {
+            background: rgba(212, 165, 116, 0.2);
+            color: #d4a574;
+            border: 1px solid rgba(212, 165, 116, 0.4);
+        }
+
+        .btn-edit:active {
+            transform: scale(0.98);
+        }
+
+        .btn-edit:hover {
+            background: rgba(212, 165, 116, 0.35);
+        }
+
+        .btn-delete {
+            background: rgba(255, 107, 107, 0.15);
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 107, 107, 0.4);
+        }
+
+        .btn-delete:active {
+            transform: scale(0.98);
+        }
+
+        .btn-delete:hover {
+            background: rgba(255, 107, 107, 0.3);
+            color: #fff;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            margin-bottom: 16px;
+        }
+
+        /* ===== MOBILE CARDS (альтернатива таблице) ===== */
+        .properties-cards {
+            display: none;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .property-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            padding: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            transition: all 0.25s ease;
+        }
+
+        .property-card:active {
+            transform: scale(0.995);
+        }
+
+        .property-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 14px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .property-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: #fff;
+            margin-bottom: 4px;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .property-location {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .property-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: #d4a574;
+            background: rgba(212, 165, 116, 0.12);
+            padding: 6px 12px;
+            border-radius: 8px;
+            min-width: fit-content;
+        }
+
+        .property-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px 14px;
+            margin-bottom: 16px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .detail-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+
+        .detail-value.badge {
+            display: inline-block;
+            padding: 3px 10px;
+            background: rgba(212, 165, 116, 0.15);
+            color: #d4a574;
+            border-radius: 20px;
+            font-size: 12px;
+            width: fit-content;
+        }
+
+        .property-actions {
+            display: flex;
+            gap: 10px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .property-actions .btn-edit,
+        .property-actions .btn-delete {
+            flex: 1;
+            padding: 11px 14px;
+            font-size: 14px;
+            min-width: auto;
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: rgba(17, 12, 9, 0.95);
+            border-top: 1px solid rgba(212, 165, 116, 0.15);
+            padding: 20px 0;
+            margin-top: auto;
+        }
+
+        .footer-bottom {
+            text-align: center;
+        }
+
+        .copyright {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 13px;
+            margin: 0;
+        }
+
+        /* ===== MEDIA QUERIES ===== */
+        
+        /* Планшеты и меньше */
+        @media (max-width: 1024px) {
+            .header-content {
+                padding: 10px 0;
+            }
+
+            .nav-menu,
+            .header-right {
+                display: none !important;
+            }
+
+            .mobile-menu-toggle {
+                display: flex !important;
+            }
+
+            .logo-text .main-title {
+                font-size: 16px;
+            }
+
+            .logo-text .sub-title {
+                font-size: 10px;
+            }
+
+            .logo-box {
+                width: 36px;
+                height: 36px;
+                font-size: 13px;
+            }
+
+            .admin-title {
+                font-size: 22px;
+            }
+
+            .btn-add {
+                padding: 10px 18px;
+                font-size: 13px;
+            }
+        }
+
+        /* Мобильные устройства — карточки вместо таблицы */
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 8px 0;
+            }
+
+            .logo-text .main-title {
+                font-size: 15px;
+            }
+
+            .logo-text .sub-title {
+                font-size: 9px;
+            }
+
+            .logo-box {
+                width: 34px;
+                height: 34px;
+                font-size: 12px;
+            }
+
+            .admin-header {
+                flex-direction: column;
+                align-items: stretch !important;
+                gap: 14px;
+            }
+
+            .admin-title {
+                font-size: 22px;
+                text-align: center;
+            }
+
+            .btn-add {
+                width: 100%;
+                justify-content: center;
+                padding: 14px;
+                font-size: 15px;
+            }
+
+            /* Скрываем таблицу, показываем карточки */
+            .properties-table {
+                display: none;
+            }
+
+            .properties-cards {
+                display: flex;
+            }
+
+            /* Увеличиваем кнопки для тач-интерфейса */
+            .btn-edit,
+            .btn-delete {
+                padding: 12px 16px;
+                font-size: 14px;
+                min-height: 44px; /* минимальная высота для тача */
+            }
+
+            .property-actions {
+                gap: 12px;
+            }
+
+            .property-actions .btn-edit,
+            .property-actions .btn-delete {
+                padding: 13px 16px;
+            }
+
+            /* Адаптация деталей карточки */
+            .property-details {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .property-price {
+                font-size: 22px;
+                padding: 8px 16px;
+            }
+
+            .property-name {
+                font-size: 17px;
+            }
+        }
+
+        /* Очень маленькие экраны */
+        @media (max-width: 400px) {
+            .container {
+                padding: 0 16px;
+            }
+
+            .logo-text .main-title {
+                font-size: 14px;
+            }
+
+            .admin-title {
+                font-size: 20px;
+            }
+
+            .property-card {
+                padding: 16px 14px;
+            }
+
+            .property-price {
+                font-size: 19px;
+                padding: 5px 10px;
+            }
+
+            .property-actions .btn-edit,
+            .property-actions .btn-delete {
+                padding: 11px 12px;
+                font-size: 13px;
+            }
+        }
+
+        /* Убираем скролл при открытом меню */
+        body.menu-open {
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* ===== АНИМАЦИИ И ЭФФЕКТЫ ===== */
+        @media (prefers-reduced-motion: no-preference) {
+            .property-card {
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+            }
+            
+            .btn-add,
+            .btn-edit,
+            .btn-delete {
+                transition: all 0.2s ease;
+            }
+        }
+
+        /* Поддержка темной темы системы */
+        @media (prefers-color-scheme: light) {
+            /* Опционально: можно добавить светлую тему */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo-section">
+                <a href="/" style="text-decoration: none; display: flex; align-items: center;">
+                    <img src="/static/images/logo.png" alt="Respect Home" class="main-logo">
+                </a>
+            </div>
+
+            <!-- БУРГЕР-КНОПКА -->
+            <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Открыть меню" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <div class="admin-nav">
+                <a href="/" class="home-link">← На главную</a>
+                <a href="/admin/logout" class="nav-link">Выход</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- МОБИЛЬНОЕ МЕНЮ -->
+    <div class="mobile-nav-overlay" id="mobileNavOverlay" role="dialog" aria-modal="true"></div>
+    <nav class="mobile-nav" id="mobileNav" aria-label="Мобильная навигация">
+        <a href="/" class="nav-link">Главная</a>
+        <a href="/properties" class="nav-link">Объекты</a>
+        <a href="/about" class="nav-link">О нас</a>
+        <a href="/contacts" class="nav-link">Контакты</a>
+        <a href="/admin" class="nav-link nav-active admin-link">✦ Admin</a>
+
+        <div class="mobile-contact-info">
+            <p>📞 Позвоните нам</p>
+            <a href="tel:+905559460190">+90 555 946 0190</a>
+            <p style="margin-top: 15px;">✉️ Email</p>
+            <a href="mailto:info@dvtgroup.com">info@dvtgroup.com</a>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container" style="padding: 20px 0;">
+            <div class="admin-header">
+                <h1 class="admin-title">Управление объектами</h1>
+                <a href="/admin/property/new" class="btn-add">
+                    <span>+</span> Добавить объект
+                </a>
+            </div>
+
+            {% if properties %}
+                <!-- Desktop: таблица -->
+                <table class="properties-table">
+                    <thead>
+                        <tr>
+                            <th>Название</th>
+                            <th>Локация</th>
+                            <th>Цена</th>
+                            <th>Тип</th>
+                            <th>Категория</th>
+                            <th>Площадь</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for property in properties %}
+                        <tr>
+                            <td><strong>{{ property.name[:35] }}{% if property.name|length > 35 %}...{% endif %}</strong></td>
+                            <td>{{ property.location }}</td>
+                            <td class="price-cell">${{ "{:,.0f}".format(property.price) }}</td>
+                            <td><span class="type-badge">{{ property.property_type }}</span></td>
+                            <td>{{ property.category }}</td>
+                            <td>{{ property.area }} м²</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="/admin/property/{{ property.id }}/edit" class="btn-edit">✎ Ред.</a>
+                                    <form method="POST" action="/admin/property/{{ property.id }}/delete" style="display: inline;">
+                                        <button type="submit" class="btn-delete" onclick="return confirm('Удалить объект «{{ property.name }}»?')">🗑 Удалить</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <!-- Mobile: карточки -->
+                <div class="properties-cards">
+                    {% for property in properties %}
+                    <article class="property-card">
+                        <div class="property-card-header">
+                            <div>
+                                <h3 class="property-name">{{ property.name }}</h3>
+                                <p class="property-location">📍 {{ property.location }}</p>
+                            </div>
+                            <div class="property-price">${{ "{:,.0f}".format(property.price) }}</div>
+                        </div>
+                        
+                        <div class="property-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Тип</span>
+                                <span class="detail-value badge">{{ property.property_type }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Категория</span>
+                                <span class="detail-value">{{ property.category }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Площадь</span>
+                                <span class="detail-value">{{ property.area }} м²</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">ID</span>
+                                <span class="detail-value">#{{ property.id }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="property-actions">
+                            <a href="/admin/property/{{ property.id }}/edit" class="btn-edit">✎ Редактировать</a>
+                            <form method="POST" action="/admin/property/{{ property.id }}/delete" style="display: contents;">
+                                <button type="submit" class="btn-delete" onclick="return confirm('Удалить объект «{{ property.name }}»?')">🗑 Удалить</button>
+                            </form>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <p>📭 Объектов пока нет</p>
+                    <a href="/admin/property/new" class="btn-add">+ Создать первый объект</a>
+                </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-bottom">
+                <p class="copyright">Copyright © 2025 Respect Home</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ===== МОБИЛЬНОЕ МЕНЮ =====
+        (function() {
+            document.addEventListener('DOMContentLoaded', function() {
+                const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+                const mobileNav = document.getElementById('mobileNav');
+                const mobileNavOverlay = document.getElementById('mobileNavOverlay');
+                const body = document.body;
+
+                if (!mobileMenuToggle || !mobileNav || !mobileNavOverlay) return;
+
+                function toggleMobileMenu() {
+                    const isActive = mobileMenuToggle.classList.toggle('active');
+                    mobileNav.classList.toggle('active');
+                    mobileNavOverlay.classList.toggle('active');
+                    body.classList.toggle('menu-open');
+                    mobileMenuToggle.setAttribute('aria-expanded', isActive);
+                    
+                    // Блокируем скролл фона
+                    if (isActive) {
+                        body.style.top = `-${window.scrollY}px`;
+                        body.style.position = 'fixed';
+                        body.style.width = '100%';
+                    } else {
+                        const scrollY = Math.abs(parseInt(body.style.top || '0'));
+                        body.style.position = '';
+                        body.style.width = '';
+                        body.style.top = '';
+                        window.scrollTo(0, scrollY);
+                    }
+                }
+
+                function closeMobileMenu() {
+                    mobileMenuToggle.classList.remove('active');
+                    mobileNav.classList.remove('active');
+                    mobileNavOverlay.classList.remove('active');
+                    body.classList.remove('menu-open');
+                    mobileMenuToggle.setAttribute('aria-expanded', 'false');
+                    
+                    // Восстанавливаем скролл
+                    const scrollY = Math.abs(parseInt(body.style.top || '0'));
+                    body.style.position = '';
+                    body.style.width = '';
+                    body.style.top = '';
+                    if (scrollY) window.scrollTo(0, scrollY);
+                }
+
+                mobileMenuToggle.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleMobileMenu();
+                });
+
+                mobileNavOverlay.addEventListener('click', closeMobileMenu);
+
+                // Закрытие по клику на ссылки
+                mobileNav.querySelectorAll('.nav-link').forEach(link => {
+                    link.addEventListener('click', closeMobileMenu);
+                });
+
+                // Закрытие по Escape
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && mobileNav.classList.contains('active')) {
+                        closeMobileMenu();
+                    }
+                });
+
+                // Закрытие при изменении размера (переход на десктоп)
+                let resizeTimer;
+                window.addEventListener('resize', () => {
+                    clearTimeout(resizeTimer);
+                    resizeTimer = setTimeout(() => {
+                        if (window.innerWidth > 1024) {
+                            closeMobileMenu();
+                        }
+                    }, 200);
+                });
+
+                console.log('✅ Мобильное меню инициализировано');
+            });
+        })();
+
+        // ===== УЛУЧШЕНИЯ ДЛЯ МОБИЛЬНЫХ =====
+        (function() {
+            // Предотвращение "прыжков" при нажатии на ссылки
+            document.addEventListener('touchstart', function() {}, {passive: true});
+            
+            // Улучшение прокрутки на мобильных
+            if ('ontouchstart' in window) {
+                document.body.classList.add('touch-device');
+            }
+        })();
+    </script>
+</body>
+</html>

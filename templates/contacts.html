@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Контакты | Respect Home</title>
+    <!-- Подключение внешнего CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Шрифты -->
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .social-block {
+            background-color: #000;
+            padding: 30px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .block-title {
+            color: #d4a373; 
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .social-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            border: 1px solid rgba(212, 163, 115, 0.3);
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            color: #d4a373;
+            font-size: 22px;
+        }
+
+        .social-icon:hover {
+            color: #ffffff;
+            background-color: #d4a373;
+            border-color: #d4a373;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(212, 163, 115, 0.2);
+        }
+
+        .social-icon i {
+            line-height: 1;
+            display: block;
+        }
+        
+        /* Стили для уведомления об отправке */
+        .form-status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+        
+        .form-status.success {
+            background-color: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+            border: 1px solid #28a745;
+        }
+        
+        .form-status.error {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+            border: 1px solid #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== HEADER ===== -->
+    <header class="main-header">
+        <div class="container header-content">
+            <div class="logo-section">
+                <a href="/" style="text-decoration: none; display: flex; align-items: center;">
+                    <img src="/static/images/logo.png" alt="Respect Home" class="main-logo">
+                </a>
+            </div>
+
+            <!-- Десктоп навигация -->
+            <nav class="desktop-nav">
+                <ul class="nav-menu">
+                    <li><a href="/" class="{% if request.path == '/' %}active{% endif %}">Главная</a></li>
+                    <li><a href="/properties" class="{% if request.path.startswith('/properties') %}active{% endif %}">Объекты</a></li>
+                    <li><a href="/about" class="{% if request.path == '/about' %}active{% endif %}">О нас</a></li>
+                    <li><a href="/contacts" class="{% if request.path == '/contacts' %}active{% endif %}">Контакты</a></li>
+                    <li><a href="/admin" class="{% if request.path == '/admin' %}active{% endif %}">Панель управления</a></li>
+                </ul>
+            </nav>
+
+            <div class="header-actions">
+                <div class="contact-info">
+                    <a href="tel:+905543323396" class="phone">+90 554 332 33 96</a>
+                </div>
+                
+                <!-- Бургер-кнопка -->
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Меню">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Мобильное меню -->
+    <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+    <nav class="mobile-nav" id="mobileNav">
+        <div class="mobile-nav-links">
+            <a href="/" class="nav-link {% if request.path == '/' %}nav-active{% endif %}">Главная</a>
+            <a href="/properties" class="nav-link {% if request.path.startswith('/properties') %}nav-active{% endif %}">Объекты</a>
+            <a href="/about" class="nav-link {% if request.path == '/about' %}nav-active{% endif %}">О нас</a>
+            <a href="/contacts" class="nav-link {% if request.path == '/contacts' %}nav-active{% endif %}">Контакты</a>
+            <a href="/admin" class="nav-link {% if request.path == '/admin' %}nav-active{% endif %}">Панель управления</a>
+        </div>
+        <div class="mobile-contact-info">
+            <p>📞 Связаться</p>
+            <a href="tel:+905559460190">+90 555 946 0190</a>
+        </div>
+    </nav>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main>
+        <section class="contacts-section">
+            <div class="container">
+                <h1 class="page-title">Свяжитесь с нами</h1>
+                <div class="contacts-content">
+                    <!-- Левая колонка с контактами -->
+                    <div class="contacts-info">
+                        <div class="contact-block">
+                            <h2 class="block-title">Офис в Алании</h2>
+                            <p class="contact-detail">
+                                <span class="detail-label">Адрес:</span>
+                                <span>Osman Hocalar sk.Nuri Ergün blok NO:2 İÇ KAPI NO:18 (Arbat -2)</span>
+                            </p>
+                            <p class="contact-detail">
+                                <span class="detail-label">Район:</span>
+                                <span>Güller Pınarı Mahallesi</span>
+                            </p>
+                            <p class="contact-detail">
+                                <span class="detail-label">Телефон:</span>
+                                <span><a href="tel:+905543323396">+90 554 332 33 96</a></span>
+                            </p>
+                            <p class="contact-detail">
+                                <span class="detail-label">Email:</span>
+                                <span><a href="mailto:anastasiiainvestor@gmail.com">anastasiiainvestor@gmail.com</a></span>
+                            </p>
+                        </div>
+
+                        <div class="contact-block">
+                            <h2 class="block-title">Часы работы</h2>
+                            <p class="contact-detail">
+                                <span class="detail-label">Пн-Пт:</span>
+                                <span>09:00 - 18:00</span>
+                            </p>
+                            <p class="contact-detail">
+                                <span class="detail-label">Сб:</span>
+                                <span>10:00 - 16:00</span>
+                            </p>
+                            <p class="contact-detail">
+                                <span class="detail-label">Вс:</span>
+                                <span>По предварительной записи</span>
+                            </p>
+                        </div>
+
+                        <div class="social-block">
+                            <h2 class="block-title">Следите за нами</h2>
+                            <div class="social-icons">
+                                <a href="https://www.instagram.com/respect_home_alanya?igsh=MTg2NmYzODJqOGcycw%3D%3D&utm_source=qr" class="social-icon" target="_blank">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                                <a href="https://t.me/Respect_Home_Alanya" class="social-icon" target="_blank">
+                                    <i class="fab fa-telegram"></i>
+                                </a>
+                                <a href="https://wa.me/905543323396" class="social-icon" target="_blank">
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                                <a href="https://youtube.com/@anastasiia_rieltor_alanya?si=lEVH9LpuC3-YYBDf" class="social-icon" target="_blank">
+                                    <i class="fab fa-youtube"></i>
+                                </a>
+                                <a href="https://www.tiktok.com/@anastasiia_respect_home?_r=1&_t=ZS-94pAnu3mWdc" class="social-icon" target="_blank">
+                                    <i class="fab fa-tiktok"></i>
+                                </a>
+                                <a href="mailto:anastasiiainvestor@gmail.com" class="social-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Правая колонка с формой -->
+                    <div class="contact-form-wrapper">
+                        <h2 class="form-title">Отправить сообщение</h2>
+                        <!-- Форма отправляется на Formspree, который перешлет на указанную почту -->
+                        <form class="contact-form" id="contactForm" action="https://formspree.io/f/xjkyqyjv" method="POST">
+                            <div class="form-group">
+                                <input type="text" name="name" placeholder="Ваше имя" required class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <input type="email" name="email" placeholder="Ваш email" required class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <input type="tel" name="phone" placeholder="Ваш телефон" required class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <textarea name="message" placeholder="Ваше сообщение" rows="6" required class="form-textarea"></textarea>
+                            </div>
+                            <!-- Скрытое поле для темы письма (опционально) -->
+                            <input type="hidden" name="_subject" value="Новое сообщение с сайта Respect Home">
+                            <!-- Скрытое поле для email получателя (уже настроено в Formspree) -->
+                            
+                            <button type="submit" class="form-button">Отправить</button>
+                            
+                            <!-- Контейнер для отображения статуса отправки -->
+                            <div id="formStatus" class="form-status"></div>
+                        </form>
+                        
+                        <!-- Альтернативный вариант: если Formspree не подходит, можно использовать mailto: -->
+                        <!-- <form class="contact-form" action="mailto:anastasiiainvestor@gmail.com" method="post" enctype="text/plain"> -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3>Respect Home</h3>
+                    <p>Ведущее агентство по недвижимости в Турции</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Навигация</h3>
+                    <a href="/properties">Объекты</a>
+                    <a href="/about">О нас</a>
+                    <a href="/contacts">Контакты</a>
+                </div>
+                <div class="footer-section">
+                    <h3>Социальные сети</h3>
+                    <a href="https://www.tiktok.com/@anastasiia_respect_home?_r=1&_t=ZS-94pAnu3mWdc">TikTok</a>
+                    <a href="https://www.instagram.com/respect_home_alanya?igsh=MTg2NmYzODJqOGcycw%3D%3D&utm_source=qr">Instagram</a>
+                    <a href="https://api.whatsapp.com/send/?phone=905543323396&text&type=phone_number&app_absent=0">WhatsApp</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="copyright">Copyright © 2025 Respect Home</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // ===== МОБИЛЬНОЕ МЕНЮ =====
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const mobileNav = document.getElementById('mobileNav');
+            const mobileNavOverlay = document.getElementById('mobileNavOverlay');
+            
+            if (mobileMenuToggle && mobileNav && mobileNavOverlay) {
+                function toggleMobileMenu() {
+                    mobileMenuToggle.classList.toggle('active');
+                    mobileNav.classList.toggle('active');
+                    mobileNavOverlay.classList.toggle('active');
+                    document.body.classList.toggle('menu-open');
+                }
+                
+                function closeMobileMenu() {
+                    mobileMenuToggle.classList.remove('active');
+                    mobileNav.classList.remove('active');
+                    mobileNavOverlay.classList.remove('active');
+                    document.body.classList.remove('menu-open');
+                }
+                
+                mobileMenuToggle.addEventListener('click', (e) => { 
+                    e.preventDefault(); 
+                    toggleMobileMenu(); 
+                });
+                
+                mobileNavOverlay.addEventListener('click', closeMobileMenu);
+                
+                document.querySelectorAll('.mobile-nav .nav-link').forEach(link => {
+                    link.addEventListener('click', closeMobileMenu);
+                });
+                
+                window.addEventListener('resize', () => { 
+                    if (window.innerWidth > 1024) closeMobileMenu(); 
+                });
+                
+                document.addEventListener('keydown', (e) => { 
+                    if (e.key === 'Escape') closeMobileMenu(); 
+                });
+            }
+
+            // ===== ОБРАБОТКА ФОРМЫ =====
+            const contactForm = document.getElementById('contactForm');
+            const formStatus = document.getElementById('formStatus');
+            
+            if (contactForm) {
+                contactForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    // Показываем статус отправки
+                    formStatus.style.display = 'block';
+                    formStatus.className = 'form-status';
+                    formStatus.textContent = 'Отправка...';
+                    
+                    // Собираем данные формы
+                    const formData = new FormData(contactForm);
+                    
+                    try {
+                        // Отправляем через Formspree
+                        const response = await fetch(contactForm.action, {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'Accept': 'application/json'
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            // Успешная отправка
+                            formStatus.className = 'form-status success';
+                            formStatus.textContent = 'Спасибо! Сообщение отправлено. Мы свяжемся с вами в ближайшее время.';
+                            contactForm.reset(); // Очищаем форму
+                            
+                            // Скрываем статус через 5 секунд
+                            setTimeout(() => {
+                                formStatus.style.display = 'none';
+                            }, 5000);
+                        } else {
+                            // Ошибка отправки
+                            const data = await response.json();
+                            throw new Error(data.error || 'Ошибка при отправке');
+                        }
+                    } catch (error) {
+                        // Ошибка сети или сервера
+                        formStatus.className = 'form-status error';
+                        formStatus.textContent = 'Произошла ошибка. Пожалуйста, попробуйте позже или напишите нам на email.';
+                        console.error('Error:', error);
+                        
+                        // Скрываем статус через 5 секунд
+                        setTimeout(() => {
+                            formStatus.style.display = 'none';
+                        }, 5000);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

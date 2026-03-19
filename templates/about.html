@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>О нас | Respect Home</title>
+    <!-- Подключение внешнего CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Шрифты -->
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* ТОЛЬКО ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ АНИМАЦИЙ */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .fade-in-left {
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        
+        .fade-in-left.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .fade-in-right {
+            opacity: 0;
+            transform: translateX(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        
+        .fade-in-right.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .scale-in {
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        
+        .scale-in.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        /* Задержки */
+        .delay-1 { transition-delay: 0.1s; }
+        .delay-2 { transition-delay: 0.2s; }
+        .delay-3 { transition-delay: 0.3s; }
+        .delay-4 { transition-delay: 0.4s; }
+        .delay-5 { transition-delay: 0.5s; }
+        
+        /* Для списка преимуществ */
+        .about-list li {
+            opacity: 0;
+            transform: translateX(-15px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        
+        .about-list li.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        /* Для карточек услуг */
+        .service-item {
+            opacity: 0;
+            transform: translateY(15px);
+            transition: opacity 0.4s ease, transform 0.4s ease, border-color 0.3s ease;
+        }
+        
+        .service-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .service-item:hover {
+            border-color: var(--accent-color);
+        }
+        
+        /* Для заголовка */
+        .page-title {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        
+        .page-title.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* ПРОСТО ТЕКСТ - без блоков, без карт, без лишнего */
+        .office-text {
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .office-text h2 {
+            font-size: 28px;
+            font-weight: 400;
+            color: var(--text-dark);
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+        }
+        
+        .office-text p {
+            font-size: 18px;
+            line-height: 1.8;
+            color: #444;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        
+        .office-text .name {
+            font-size: 20px;
+            font-weight: 500;
+            color: var(--text-dark);
+            margin: 25px 0 10px;
+        }
+        
+        .office-text .address-line {
+            font-size: 18px;
+            margin: 5px 0;
+            color: #555;
+        }
+        
+        .office-text .country {
+            margin-top: 15px;
+            color: var(--accent-color);
+            font-weight: 400;
+        }
+        
+        .office-text .divider {
+            width: 40px;
+            height: 1px;
+            background: var(--accent-color);
+            margin: 25px auto;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== HEADER ===== -->
+    <header class="main-header">
+        <div class="container header-content">
+            <div class="logo-section">
+                <a href="/" style="text-decoration: none; display: flex; align-items: center;">
+                    <img src="/static/images/logo.png" alt="Respect Home" class="main-logo">
+                </a>
+            </div>
+
+            <nav class="desktop-nav">
+                <ul class="nav-menu">
+                    <li><a href="/" class="{% if request.path == '/' %}active{% endif %}">Главная</a></li>
+                    <li><a href="/properties" class="{% if request.path.startswith('/properties') %}active{% endif %}">Объекты</a></li>
+                    <li><a href="/about" class="{% if request.path == '/about' %}active{% endif %}">О нас</a></li>
+                    <li><a href="/contacts" class="{% if request.path == '/contacts' %}active{% endif %}">Контакты</a></li>
+                    <li><a href="/admin" class="{% if request.path == '/admin' %}active{% endif %}">Панель управления</a></li>
+                </ul>
+            </nav>
+
+            <div class="header-actions">
+                <div class="contact-info">
+                    <a href="tel:+905543323396" class="phone">+90 554 332 33 96</a>
+                </div>
+                
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Меню">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Мобильное меню -->
+    <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+    <nav class="mobile-nav" id="mobileNav">
+        <div class="mobile-nav-links">
+            <a href="/" class="nav-link {% if request.path == '/' %}nav-active{% endif %}">Главная</a>
+            <a href="/properties" class="nav-link {% if request.path.startswith('/properties') %}nav-active{% endif %}">Объекты</a>
+            <a href="/about" class="nav-link {% if request.path == '/about' %}nav-active{% endif %}">О нас</a>
+            <a href="/contacts" class="nav-link {% if request.path == '/contacts' %}nav-active{% endif %}">Контакты</a>
+            <a href="/admin" class="nav-link {% if request.path == '/admin' %}nav-active{% endif %}">Панель управления</a>
+        </div>
+        <div class="mobile-contact-info">
+            <p>📞 Связаться</p>
+            <a href="tel:+905559460190">+90 555 946 0190</a>
+        </div>
+    </nav>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main>
+        <section class="about-section">
+            <div class="container">
+                <h1 class="page-title" id="pageTitle">О компании Respect Home</h1>
+                
+                <div class="about-content">
+                    <!-- Блок 1: Кто мы -->
+                    <div class="about-block fade-in" id="block1">
+                        <h2 class="section-title">Кто мы</h2>
+                        <p><strong>Respect Home</strong> — ведущее агентство по недвижимости в Турции. Наша команда — это эксперты, глубоко понимающие локальный рынок. Мы специализируемся на премиальной недвижимости в Стамбуле, Анталье, Аланье и других популярных курортных зонах.</p>
+                        <p>Наша миссия — помочь клиентам найти идеальную недвижимость для жизни, инвестиций или отдыха, обеспечив полный спектр услуг от подбора объекта до получения вида на жительство. Мы строим отношения на доверии и уважении, отсюда и наше название — Respect Home.</p>
+                    </div>
+
+                    <!-- Блок 2: Наши преимущества -->
+                    <div class="about-block fade-in" id="block2">
+                        <h2 class="section-title">Наши преимущества</h2>
+                        <ul class="about-list" id="advantagesList">
+                            <li>Тысячи успешных сделок — наша репутация говорит сама за себя</li>
+                            <li>Эксклюзивные объекты в премиальных локациях</li>
+                            <li>Полное юридическое сопровождение сделок</li>
+                            <li>Помощь в получении вида на жительство в Турции</li>
+                            <li>Команда говорит на 5+ языках (русский, английский, турецкий, арабский, немецкий)</li>
+                            <li>Работаем 24/7 для удобства наших клиентов</li>
+                        </ul>
+                    </div>
+
+                    <!-- Блок 3: Наши услуги -->
+                    <div class="about-block fade-in" id="block3">
+                        <h2 class="section-title">Наши услуги</h2>
+                        <div class="services-grid-about" id="servicesGrid">
+                            <div class="service-item">
+                                <h3>🏠 Подбор недвижимости</h3>
+                                <p>Индивидуальный поиск объектов по вашим критериям</p>
+                            </div>
+                            <div class="service-item">
+                                <h3>📋 Юридическое сопровождение</h3>
+                                <p>Полная проверка документов и безопасное оформление</p>
+                            </div>
+                            <div class="service-item">
+                                <h3>🏦 Ипотечное кредитование</h3>
+                                <p>Помощь в получении ипотеки для иностранцев</p>
+                            </div>
+                            <div class="service-item">
+                                <h3>🛂 ВНЖ и гражданство</h3>
+                                <p>Консультации и помощь в оформлении документов</p>
+                            </div>
+                            <div class="service-item">
+                                <h3>🔑 Управление недвижимостью</h3>
+                                <p>Сдача в аренду, обслуживание, полный контроль</p>
+                            </div>
+                            <div class="service-item">
+                                <h3>💼 Инвестиционные консультации</h3>
+                                <p>Анализ рынка и подбор инвестиционных объектов</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Блок 4: Почему Турция -->
+                    <div class="about-block fade-in" id="block4">
+                        <h2 class="section-title">Почему Турция?</h2>
+                        <p>Турция утвердилась как одна из самых надежных юрисдикций для владения активами. Политическая устойчивость, прозрачное законодательство и гарантированная защита прав собственности делают местный рынок недвижимости эталоном безопасности. В сочетании с программами ВНЖ, возможностью получения гражданства и динамичным ростом цен, это создает идеальные условия для долгосрочного сохранения и приумножения капитала.</p>
+                        <p>Аланья — жемчужина Турецкой Ривьеры, где уникальное сочетание горного воздуха и чистого Средиземного моря создает идеальные условия для жизни 365 дней в году.</p>
+                    </div>
+                </div>
+
+                <!-- ПРОСТО ТЕКСТ. НИКАКИХ БЛОКОВ. ТОЛЬКО ТЕКСТ. -->
+                <div class="office-text fade-in">
+                    <h2>Наш офис в Аланье</h2>
+                    
+                    <p>+90 554 332 33 96</p>
+                    <p>anastasiiainvestor@gmail.com</p>
+                    <p>ежедневно с 09:00 до 20:00</p>
+                    
+                    <div class="divider"></div>
+                    <p class="address-line">Antalya / Alanya </p>
+                    <p class="address-line">Güller Pınarı Mahallesi</p>
+                    <p class="address-line">Osman Hocalar sk. Nuri Ergün blok NO:2</p>
+                    <p class="address-line">İÇ KAPI NO:18 (Arbat-2)</p>
+                    
+                    <p class="name">Анастасия Омельченко</p>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta-section">
+            <div class="container">
+                <div class="cta-content scale-in" id="ctaContent">
+                    <h2>Готовы начать?</h2>
+                    <p>Свяжитесь с нами для консультации</p>
+                    <div class="cta-buttons">
+                        <a href="/contacts" class="cta-button primary">Связаться</a>
+                        <a href="/properties" class="cta-button secondary">Смотреть объекты</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-grid">
+                <div class="footer-section fade-in-left delay-1">
+                    <h3>Respect Home</h3>
+                    <p>Ведущее агентство по недвижимости в Турции</p>
+                </div>
+                <div class="footer-section fade-in-left delay-2">
+                    <h3>Навигация</h3>
+                    <a href="/properties">Объекты</a>
+                    <a href="/about">О нас</a>
+                    <a href="/contacts">Контакты</a>
+                </div>
+                <div class="footer-section">
+                    <h3>Социальные сети</h3>
+                    <a href="https://www.tiktok.com/@anastasiia_respect_home">TikTok</a>
+                    <a href="https://www.instagram.com/respect_home_alanya">Instagram</a>
+                    <a href="https://api.whatsapp.com/send/?phone=905543323396">WhatsApp</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="copyright">Copyright © 2025 Respect Home</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Мобильное меню
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const mobileNav = document.getElementById('mobileNav');
+            const mobileNavOverlay = document.getElementById('mobileNavOverlay');
+            
+            if (mobileMenuToggle && mobileNav && mobileNavOverlay) {
+                function toggleMobileMenu() {
+                    mobileMenuToggle.classList.toggle('active');
+                    mobileNav.classList.toggle('active');
+                    mobileNavOverlay.classList.toggle('active');
+                    document.body.classList.toggle('menu-open');
+                }
+                
+                function closeMobileMenu() {
+                    mobileMenuToggle.classList.remove('active');
+                    mobileNav.classList.remove('active');
+                    mobileNavOverlay.classList.remove('active');
+                    document.body.classList.remove('menu-open');
+                }
+                
+                mobileMenuToggle.addEventListener('click', (e) => { 
+                    e.preventDefault(); 
+                    toggleMobileMenu(); 
+                });
+                
+                mobileNavOverlay.addEventListener('click', closeMobileMenu);
+                
+                document.querySelectorAll('.mobile-nav .nav-link').forEach(link => {
+                    link.addEventListener('click', closeMobileMenu);
+                });
+                
+                window.addEventListener('resize', () => { 
+                    if (window.innerWidth > 1024) closeMobileMenu(); 
+                });
+                
+                document.addEventListener('keydown', (e) => { 
+                    if (e.key === 'Escape') closeMobileMenu(); 
+                });
+            }
+
+            // Анимации
+            function isElementInViewport(el) {
+                if (!el) return false;
+                const rect = el.getBoundingClientRect();
+                const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+                return rect.top <= windowHeight - 50 && rect.bottom >= 0;
+            }
+            
+            function checkVisibility() {
+                const pageTitle = document.getElementById('pageTitle');
+                if (pageTitle && isElementInViewport(pageTitle)) {
+                    pageTitle.classList.add('visible');
+                }
+                
+                document.querySelectorAll('.fade-in').forEach(el => {
+                    if (isElementInViewport(el)) {
+                        el.classList.add('visible');
+                    }
+                });
+                
+                const ctaContent = document.getElementById('ctaContent');
+                if (ctaContent && isElementInViewport(ctaContent)) {
+                    ctaContent.classList.add('visible');
+                }
+                
+                document.querySelectorAll('.footer-section').forEach(el => {
+                    if (isElementInViewport(el)) {
+                        el.classList.add('visible');
+                    }
+                });
+                
+                const listItems = document.querySelectorAll('#advantagesList li');
+                listItems.forEach((item, index) => {
+                    if (isElementInViewport(item)) {
+                        setTimeout(() => {
+                            item.classList.add('visible');
+                        }, index * 100);
+                    }
+                });
+                
+                const serviceItems = document.querySelectorAll('.service-item');
+                serviceItems.forEach((item, index) => {
+                    if (isElementInViewport(item)) {
+                        setTimeout(() => {
+                            item.classList.add('visible');
+                        }, index * 120);
+                    }
+                });
+            }
+            
+            setTimeout(checkVisibility, 100);
+            window.addEventListener('scroll', checkVisibility);
+            window.addEventListener('resize', checkVisibility);
+        });
+    </script>
+</body>
+</html>
