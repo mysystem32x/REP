@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Объекты недвижимости | Respect Home</title>
+    <!-- Подключение внешнего CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Шрифты -->
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- ===== HEADER ===== -->
+    <header class="main-header">
+        <div class="container header-content">
+            <div class="logo-section">
+                <a href="/" style="text-decoration: none; display: flex; align-items: center;">
+                    <img src="/static/images/logo.png" alt="Respect Home" class="main-logo">
+                </a>
+            </div>
+
+            <nav class="desktop-nav">
+                <ul class="nav-menu">
+                    <li><a href="/" class="{% if request.path == '/' %}active{% endif %}">Главная</a></li>
+                    <li><a href="/properties" class="{% if request.path.startswith('/properties') %}active{% endif %}">Объекты</a></li>
+                    <li><a href="/about" class="{% if request.path == '/about' %}active{% endif %}">О нас</a></li>
+                    <li><a href="/contacts" class="{% if request.path == '/contacts' %}active{% endif %}">Контакты</a></li>
+                    <li><a href="/admin" class="{% if request.path == '/admin' %}active{% endif %}">Панель управления</a></li>
+                </ul>
+            </nav>
+
+            <div class="header-actions">
+                <div class="contact-info">
+                    <a href="tel:+905559460190" class="phone">+90 554 332 33 96</a>
+                </div>
+                
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Меню">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Мобильное меню -->
+    <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+    <nav class="mobile-nav" id="mobileNav">
+        <div class="mobile-nav-links">
+            <a href="/" class="nav-link {% if request.path == '/' %}nav-active{% endif %}">Главная</a>
+            <a href="/properties" class="nav-link {% if request.path.startswith('/properties') %}nav-active{% endif %}">Объекты</a>
+            <a href="/about" class="nav-link {% if request.path == '/about' %}nav-active{% endif %}">О нас</a>
+            <a href="/contacts" class="nav-link {% if request.path == '/contacts' %}nav-active{% endif %}">Контакты</a>
+        </div>
+        <div class="mobile-contact-info">
+            <p>📞 Связаться</p>
+        <a href="tel:+905543323396">+90 554 332 33 96</a>
+        </div>
+    </nav>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main>
+        <section class="properties-header">
+            <div class="container">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 20px;">
+                    <h1 class="properties-title" style="text-align: center;">Каталог недвижимости</h1>
+                    <div>
+                        <span class="stats-badge" id="property-stats">{{ properties|length }} объектов</span>
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <input type="text" id="search-input" class="search-input" placeholder="Поиск по названию или локации...">
+                    <button class="filter-btn" onclick="toggleFilterModal()">
+                        <svg viewBox="0 0 24 24" width="18" height="18">
+                            <path d="M4 6h16v2H4zm2 4h12v2H6zm3 4h6v2H9z" fill="currentColor"/>
+                        </svg>
+                        Расширенный фильтр
+                        <span class="filter-badge" id="filter-badge" style="display: none;">0</span>
+                    </button>
+                </div>
+                <div class="active-filters" id="active-filters"></div>
+            </div>
+        </section>
+
+        <section class="properties-section">
+            <div class="container">
+                {% if selected_category %}
+                <div style="margin-bottom: 30px; text-align: center;">
+                    <p style="opacity: 0.7; margin-bottom: 15px;">Фильтр по категории</p>
+                    <a href="/properties" class="reset-btn" style="display: inline-block; padding: 8px 20px;">← Убрать фильтр</a>
+                </div>
+                {% endif %}
+
+                <div class="properties-grid" id="properties-grid">
+                    {% if properties %}
+                        {% for property in properties %}
+                        <div class="property-card"
+                             data-id="{{ property.id }}"
+                             data-type="{{ property.property_type }}"
+                             data-price="{{ property.price }}"
+                             data-name="{{ property.name | lower }}"
+                             data-location="{{ property.location | lower }}"
+                             data-area="{{ property.area }}"
+                             data-bedrooms="{{ property.bedrooms }}"
+                             data-bathrooms="{{ property.bathrooms }}"
+                             data-features="{{ property.features|lower if property.features else '' }}">
+                            <div class="property-image-wrapper">
+                                <img src="{{ property.image }}" alt="{{ property.name }}" class="property-image">
+                                <div class="property-price-tag">${{ "{:,.0f}".format(property.price) }}</div>
+                                <div class="property-overlay">
+                                    <a href="/property/{{ property.id }}" class="view-details">Подробнее</a>
+                                </div>
+                            </div>
+                            <div class="property-info">
+                                <h3 class="property-name">{{ property.name }}</h3>
+                                <p class="property-location">
+                                    <i class="fas fa-map-marker-alt" style="color: var(--accent-color);"></i>
+                                    {{ property.location }}
+                                </p>
+                                <div class="property-specs">
+                                    <span class="spec-item">
+                                        <i class="fas fa-ruler-combined"></i>
+                                        {{ property.area }} м²
+                                    </span>
+                                    <span class="spec-item">
+                                        <i class="fas fa-bed"></i>
+                                        {{ property.bedrooms }}
+                                    </span>
+                                    <span class="spec-item">
+                                        <i class="fas fa-bath"></i>
+                                        {{ property.bathrooms }}
+                                    </span>
+                                </div>
+                                <div class="property-footer">
+                                    <span class="property-price">${{ "{:,.0f}".format(property.price) }}</span>
+                                    <span class="property-type">{{ property.property_type }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; opacity: 0.6;">
+                        <i class="fas fa-home" style="font-size: 48px; color: var(--accent-color); margin-bottom: 20px;"></i>
+                        <h3 style="font-size: 20px; margin-bottom: 10px;">Объектов не найдено</h3>
+                        <p>Попробуйте изменить параметры поиска</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===== УЛУЧШЕННОЕ МОДАЛЬНОЕ ОКНО ФИЛЬТРА ===== -->
+    <div class="modal-overlay" id="modal-overlay" onclick="toggleFilterModal()"></div>
+    <div class="filter-modal enhanced" id="filter-modal">
+        <div class="filter-header">
+            <h3><i class="fas fa-sliders-h" style="margin-right: 10px;"></i>Расширенный фильтр</h3>
+            <button class="close-modal" onclick="toggleFilterModal()">×</button>
+        </div>
+        
+        <div class="filter-tabs">
+            <button class="filter-tab active" data-tab="basic">Основное</button>
+            <button class="filter-tab" data-tab="area">Площадь</button>
+            <button class="filter-tab" data-tab="features">Удобства</button>
+        </div>
+
+        <div class="filter-tab-content active" id="tab-basic">
+            <div class="filter-group">
+                <label><i class="fas fa-building" style="margin-right: 8px;"></i>Тип недвижимости</label>
+                <div class="filter-options-grid">
+                    <label class="filter-option-card">
+                        <input type="radio" name="property-type" value="" checked>
+                        <span>Все</span>
+                    </label>
+                    <label class="filter-option-card">
+                        <input type="radio" name="property-type" value="Квартира">
+                        <span>Квартира</span>
+                    </label>
+                    <label class="filter-option-card">
+                        <input type="radio" name="property-type" value="Вилла">
+                        <span>Вилла</span>
+                    </label>
+                    <label class="filter-option-card">
+                        <input type="radio" name="property-type" value="Студия">
+                        <span>Студия</span>
+                    </label>
+                    <label class="filter-option-card">
+                        <input type="radio" name="property-type" value="Пентхаус">
+                        <span>Пентхаус</span>
+                    </label>
+                    <label class="filter-option-card">
+                        <input type="radio" name="property-type" value="Комплекс">
+                        <span>Комплекс</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label><i class="fas fa-dollar-sign" style="margin-right: 8px;"></i>Цена ($)</label>
+                <div class="range-slider">
+                    <div class="range-values">
+                        <span id="price-min-display">0</span> - <span id="price-max-display">10M+</span>
+                    </div>
+                    <input type="range" id="price-range-min" class="range-slider-input" min="0" max="10000000" step="10000" value="0">
+                    <input type="range" id="price-range-max" class="range-slider-input" min="0" max="10000000" step="10000" value="10000000">
+                </div>
+                <div class="range-inputs">
+                    <input type="number" id="price-min" class="range-input" placeholder="От" min="0" step="10000">
+                    <input type="number" id="price-max" class="range-input" placeholder="До" min="0" step="10000">
+                </div>
+            </div>
+
+            <div class="filter-row">
+                <div class="filter-col">
+                    <label><i class="fas fa-bed"></i> Спальни</label>
+                    <div class="filter-buttons-group" id="bedrooms-buttons">
+                        <button class="filter-option-btn" data-value="">Любое</button>
+                        <button class="filter-option-btn" data-value="1">1+</button>
+                        <button class="filter-option-btn" data-value="2">2+</button>
+                        <button class="filter-option-btn" data-value="3">3+</button>
+                        <button class="filter-option-btn" data-value="4">4+</button>
+                        <button class="filter-option-btn" data-value="5">5+</button>
+                    </div>
+                    <input type="hidden" id="bedrooms-filter" value="">
+                </div>
+                <div class="filter-col">
+                    <label><i class="fas fa-bath"></i> Ванные</label>
+                    <div class="filter-buttons-group" id="bathrooms-buttons">
+                        <button class="filter-option-btn" data-value="">Любое</button>
+                        <button class="filter-option-btn" data-value="1">1+</button>
+                        <button class="filter-option-btn" data-value="2">2+</button>
+                        <button class="filter-option-btn" data-value="3">3+</button>
+                        <button class="filter-option-btn" data-value="4">4+</button>
+                    </div>
+                    <input type="hidden" id="bathrooms-filter" value="">
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-tab-content" id="tab-area">
+            <div class="filter-group">
+                <label><i class="fas fa-ruler-combined"></i> Площадь (м²)</label>
+                <div class="range-slider">
+                    <div class="range-values">
+                        <span id="area-min-display">0</span> - <span id="area-max-display">500+</span>
+                    </div>
+                    <input type="range" id="area-range-min" class="range-slider-input" min="0" max="500" step="10" value="0">
+                    <input type="range" id="area-range-max" class="range-slider-input" min="0" max="500" step="10" value="500">
+                </div>
+                <div class="range-inputs">
+                    <input type="number" id="area-min" class="range-input" placeholder="От" min="0" step="10">
+                    <input type="number" id="area-max" class="range-input" placeholder="До" min="0" step="10">
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label>Этаж</label>
+                <div class="filter-buttons-group" id="floor-buttons">
+                    <button class="filter-option-btn" data-value="">Любой</button>
+                    <button class="filter-option-btn" data-value="1">1-3</button>
+                    <button class="filter-option-btn" data-value="4">4-7</button>
+                    <button class="filter-option-btn" data-value="8">8+</button>
+                </div>
+                <input type="hidden" id="floor-filter" value="">
+            </div>
+        </div>
+
+        <div class="filter-tab-content" id="tab-features">
+            <div class="filter-group">
+                <label><i class="fas fa-star"></i> Удобства</label>
+                <div class="features-grid">
+                    <label class="feature-card">
+                        <input type="checkbox" value="бассейн" class="feature-checkbox">
+                        <i class="fas fa-swimming-pool"></i>
+                        <span>Бассейн</span>
+                    </label>
+                    <label class="feature-card">
+                        <input type="checkbox" value="парковка" class="feature-checkbox">
+                        <i class="fas fa-parking"></i>
+                        <span>Парковка</span>
+                    </label>
+                    <label class="feature-card">
+                        <input type="checkbox" value="гараж" class="feature-checkbox">
+                        <i class="fas fa-warehouse"></i>
+                        <span>Гараж</span>
+                    </label>
+                    <label class="feature-card">
+                        <input type="checkbox" value="терраса" class="feature-checkbox">
+                        <i class="fas fa-umbrella-beach"></i>
+                        <span>Терраса</span>
+                    </label>
+                    <label class="feature-card">
+                        <input type="checkbox" value="сад" class="feature-checkbox">
+                        <i class="fas fa-tree"></i>
+                        <span>Сад</span>
+                    </label>
+                    <label class="feature-card">
+                        <input type="checkbox" value="спортзал" class="feature-checkbox">
+                        <i class="fas fa-dumbbell"></i>
+                        <span>Спортзал</span>
+                    </label>
+                    <label class="feature-card">
+                        <input type="checkbox" value="сауна" class="feature-checkbox">
+                        <i class="fas fa-hot-tub"></i>
+                        <span>Сауна</span>
+                    </label>
+                    <label class="feature-card">
+                        <input type="checkbox" value="кондиционер" class="feature-checkbox">
+                        <i class="fas fa-wind"></i>
+                        <span>Кондиционер</span>
+                    </label>
+                    <label class="feature-card">
+                        <input type="checkbox" value="интернет" class="feature-checkbox">
+                        <i class="fas fa-wifi"></i>
+                        <span>Интернет</span>
+                    </label>
+                    <label class="feature-card">
+                        <input type="checkbox" value="мебель" class="feature-checkbox">
+                        <i class="fas fa-couch"></i>
+                        <span>С мебелью</span>
+                    </label>
+                    <label class="feature-card">
+                        <input type="checkbox" value="вид на море" class="feature-checkbox">
+                        <i class="fas fa-water"></i>
+                        <span>Вид на море</span>
+                    </label>
+                    <label class="feature-card">
+                        <input type="checkbox" value="камин" class="feature-checkbox">
+                        <i class="fas fa-fire"></i>
+                        <span>Камин</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-footer">
+            <div class="selected-filters-summary" id="selected-filters-summary">
+                <span>Выбрано фильтров: <span id="filter-count">0</span></span>
+            </div>
+            <div class="filter-buttons">
+                <button class="apply-btn" onclick="applyAdvancedFilters()">
+                    <i class="fas fa-check"></i> Применить
+                </button>
+                <button class="reset-btn" onclick="resetAllFilters()">
+                    <i class="fas fa-undo"></i> Сбросить
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3>Respect Home</h3>
+                    <p>Ведущее агентство по недвижимости в Турции</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Навигация</h3>
+                    <a href="/properties">Объекты</a>
+                    <a href="/about">О нас</a>
+                    <a href="/contacts">Контакты</a>
+                </div>
+                <div class="footer-section">
+                    <h3>Социальные сети</h3>
+                    <a href="https://www.tiktok.com/@anastasiia_respect_home?_r=1&_t=ZS-94pAnu3mWdc">TikTok</a>
+                    <a href="https://www.instagram.com/respect_home_alanya?igsh=MTg2NmYzODJqOGcycw%3D%3D&utm_source=qr">Instagram</a>
+                    <a href="https://api.whatsapp.com/send/?phone=905543323396&text&type=phone_number&app_absent=0">WhatsApp</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="copyright">Copyright © 2025 Respect Home</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        // Мобильное меню
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const mobileNav = document.getElementById('mobileNav');
+            const mobileNavOverlay = document.getElementById('mobileNavOverlay');
+            
+            if (!mobileMenuToggle || !mobileNav || !mobileNavOverlay) return;
+
+            function toggleMobileMenu() {
+                mobileMenuToggle.classList.toggle('active');
+                mobileNav.classList.toggle('active');
+                mobileNavOverlay.classList.toggle('active');
+                document.body.classList.toggle('menu-open');
+            }
+            
+            function closeMobileMenu() {
+                mobileMenuToggle.classList.remove('active');
+                mobileNav.classList.remove('active');
+                mobileNavOverlay.classList.remove('active');
+                document.body.classList.remove('menu-open');
+            }
+            
+            mobileMenuToggle.addEventListener('click', (e) => { 
+                e.preventDefault(); 
+                e.stopPropagation(); 
+                toggleMobileMenu(); 
+            });
+            
+            mobileNavOverlay.addEventListener('click', closeMobileMenu);
+            
+            mobileNav.querySelectorAll('.nav-link').forEach(link => 
+                link.addEventListener('click', closeMobileMenu)
+            );
+            
+            window.addEventListener('resize', () => { 
+                if (window.innerWidth > 1024) closeMobileMenu(); 
+            });
+            
+            document.addEventListener('keydown', (e) => { 
+                if (e.key === 'Escape') closeMobileMenu(); 
+            });
+        });
+
+        // Улучшенные фильтры
+        const searchInput = document.getElementById('search-input');
+        const propertyCards = document.querySelectorAll('.property-card');
+        const filterModal = document.getElementById('filter-modal');
+        const modalOverlay = document.getElementById('modal-overlay');
+        const activeFiltersDiv = document.getElementById('active-filters');
+        const propertyStats = document.getElementById('property-stats');
+        const filterBadge = document.getElementById('filter-badge');
+        
+        let activeFilters = {};
+
+        // Переключение вкладок
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.filter-tab-content').forEach(c => c.classList.remove('active'));
+                
+                this.classList.add('active');
+                const tabId = this.dataset.tab;
+                document.getElementById(`tab-${tabId}`).classList.add('active');
+            });
+        });
+
+        // Обработка кнопок выбора
+        function setupFilterButtons(containerId, hiddenInputId) {
+            const container = document.getElementById(containerId);
+            const hiddenInput = document.getElementById(hiddenInputId);
+            
+            if (!container || !hiddenInput) return;
+            
+            container.querySelectorAll('.filter-option-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    container.querySelectorAll('.filter-option-btn').forEach(b => 
+                        b.classList.remove('active')
+                    );
+                    this.classList.add('active');
+                    hiddenInput.value = this.dataset.value;
+                    updateFilterCount();
+                });
+            });
+        }
+
+        setupFilterButtons('bedrooms-buttons', 'bedrooms-filter');
+        setupFilterButtons('bathrooms-buttons', 'bathrooms-filter');
+        setupFilterButtons('floor-buttons', 'floor-filter');
+
+        // Рендж слайдеры
+        const priceMin = document.getElementById('price-min');
+        const priceMax = document.getElementById('price-max');
+        const priceRangeMin = document.getElementById('price-range-min');
+        const priceRangeMax = document.getElementById('price-range-max');
+        const priceMinDisplay = document.getElementById('price-min-display');
+        const priceMaxDisplay = document.getElementById('price-max-display');
+
+        function updatePriceInputs() {
+            const min = parseInt(priceRangeMin.value);
+            const max = parseInt(priceRangeMax.value);
+            
+            if (min > max) {
+                priceRangeMin.value = max;
+                priceMin.value = max;
+            } else {
+                priceMin.value = min;
+            }
+            
+            priceMax.value = max;
+            priceMinDisplay.textContent = min === 0 ? '0' : min.toLocaleString();
+            priceMaxDisplay.textContent = max >= 10000000 ? '10M+' : max.toLocaleString();
+            updateFilterCount();
+        }
+
+        function updatePriceSliders() {
+            const min = parseInt(priceMin.value) || 0;
+            const max = parseInt(priceMax.value) || 10000000;
+            
+            if (min > max) {
+                priceMin.value = max;
+                priceRangeMin.value = max;
+            } else {
+                priceRangeMin.value = min;
+            }
+            
+            priceRangeMax.value = max;
+            priceMinDisplay.textContent = min === 0 ? '0' : min.toLocaleString();
+            priceMaxDisplay.textContent = max >= 10000000 ? '10M+' : max.toLocaleString();
+        }
+
+        priceRangeMin?.addEventListener('input', updatePriceInputs);
+        priceRangeMax?.addEventListener('input', updatePriceInputs);
+        priceMin?.addEventListener('input', updatePriceSliders);
+        priceMax?.addEventListener('input', updatePriceSliders);
+
+        // Площадь
+        const areaMin = document.getElementById('area-min');
+        const areaMax = document.getElementById('area-max');
+        const areaRangeMin = document.getElementById('area-range-min');
+        const areaRangeMax = document.getElementById('area-range-max');
+        const areaMinDisplay = document.getElementById('area-min-display');
+        const areaMaxDisplay = document.getElementById('area-max-display');
+
+        function updateAreaInputs() {
+            const min = parseInt(areaRangeMin.value);
+            const max = parseInt(areaRangeMax.value);
+            
+            if (min > max) {
+                areaRangeMin.value = max;
+                areaMin.value = max;
+            } else {
+                areaMin.value = min;
+            }
+            
+            areaMax.value = max;
+            areaMinDisplay.textContent = min;
+            areaMaxDisplay.textContent = max >= 500 ? '500+' : max;
+            updateFilterCount();
+        }
+
+        function updateAreaSliders() {
+            const min = parseInt(areaMin.value) || 0;
+            const max = parseInt(areaMax.value) || 500;
+            
+            if (min > max) {
+                areaMin.value = max;
+                areaRangeMin.value = max;
+            } else {
+                areaRangeMin.value = min;
+            }
+            
+            areaRangeMax.value = max;
+            areaMinDisplay.textContent = min;
+            areaMaxDisplay.textContent = max >= 500 ? '500+' : max;
+        }
+
+        areaRangeMin?.addEventListener('input', updateAreaInputs);
+        areaRangeMax?.addEventListener('input', updateAreaInputs);
+        areaMin?.addEventListener('input', updateAreaSliders);
+        areaMax?.addEventListener('input', updateAreaSliders);
+
+        // Подсчет активных фильтров
+        function updateFilterCount() {
+            let count = 0;
+            
+            // Тип недвижимости
+            const selectedType = document.querySelector('input[name="property-type"]:checked');
+            if (selectedType && selectedType.value) count++;
+            
+            // Цена
+            if ((priceMin?.value && priceMin.value > 0) || (priceMax?.value && priceMax.value < 10000000)) count++;
+            
+            // Площадь
+            if ((areaMin?.value && areaMin.value > 0) || (areaMax?.value && areaMax.value < 500)) count++;
+            
+            // Спальни
+            if (document.getElementById('bedrooms-filter')?.value) count++;
+            
+            // Ванные
+            if (document.getElementById('bathrooms-filter')?.value) count++;
+            
+            // Удобства
+            const features = document.querySelectorAll('.feature-checkbox:checked').length;
+            if (features > 0) count += features;
+            
+            // Этаж
+            if (document.getElementById('floor-filter')?.value) count++;
+            
+            document.getElementById('filter-count').textContent = count;
+            
+            if (count > 0) {
+                filterBadge.style.display = 'inline-flex';
+                filterBadge.textContent = count;
+            } else {
+                filterBadge.style.display = 'none';
+            }
+        }
+
+        document.querySelectorAll('input[name="property-type"], .feature-checkbox').forEach(el => {
+            el.addEventListener('change', updateFilterCount);
+        });
+
+        function toggleFilterModal() {
+            filterModal.classList.toggle('active');
+            modalOverlay.classList.toggle('active');
+            if (filterModal.classList.contains('active')) {
+                loadCurrentFiltersToModal();
+            }
+        }
+
+        function loadCurrentFiltersToModal() {
+            // Загрузка типа
+            const typeValue = document.getElementById('modal-type-filter')?.value;
+            if (typeValue) {
+                document.querySelector(`input[name="property-type"][value="${typeValue}"]`).checked = true;
+            }
+            
+            // Загрузка цены
+            const [priceMinVal, priceMaxVal] = (activeFilters.price || '0-10000000').split('-').map(Number);
+            priceMin.value = priceMinVal || 0;
+            priceMax.value = (priceMaxVal && priceMaxVal < 10000000) ? priceMaxVal : 10000000;
+            updatePriceSliders();
+            
+            // Загрузка спален
+            if (activeFilters.bedrooms) {
+                const bedroomBtn = document.querySelector(`#bedrooms-buttons [data-value="${activeFilters.bedrooms}"]`);
+                if (bedroomBtn) bedroomBtn.click();
+            }
+            
+            // Загрузка ванных
+            if (activeFilters.bathrooms) {
+                const bathroomBtn = document.querySelector(`#bathrooms-buttons [data-value="${activeFilters.bathrooms}"]`);
+                if (bathroomBtn) bathroomBtn.click();
+            }
+            
+            // Загрузка удобств
+            document.querySelectorAll('.feature-checkbox').forEach(cb => cb.checked = false);
+            if (activeFilters.features) {
+                activeFilters.features.split(',').forEach(feature => {
+                    const checkbox = document.querySelector(`.feature-checkbox[value="${feature}"]`);
+                    if (checkbox) checkbox.checked = true;
+                });
+            }
+            
+            updateFilterCount();
+        }
+
+        function filterProperties() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const typeValue = document.querySelector('input[name="property-type"]:checked')?.value || '';
+            const priceMin = parseFloat(document.getElementById('price-min')?.value) || 0;
+            const priceMax = parseFloat(document.getElementById('price-max')?.value) || 10000000;
+            const areaMin = parseFloat(document.getElementById('area-min')?.value) || 0;
+            const areaMax = parseFloat(document.getElementById('area-max')?.value) || 500;
+            const bedroomsMin = parseInt(document.getElementById('bedrooms-filter')?.value) || 0;
+            const bathroomsMin = parseInt(document.getElementById('bathrooms-filter')?.value) || 0;
+            const selectedFeatures = Array.from(document.querySelectorAll('.feature-checkbox:checked')).map(cb => cb.value);
+            
+            let visibleCount = 0;
+
+            propertyCards.forEach(card => {
+                let show = true;
+                
+                if (searchTerm && !card.dataset.name.includes(searchTerm) && !card.dataset.location.includes(searchTerm)) {
+                    show = false;
+                }
+                
+                if (typeValue && card.dataset.type !== typeValue) show = false;
+                
+                const price = parseFloat(card.dataset.price);
+                if (price < priceMin || price > priceMax) show = false;
+                
+                const area = parseFloat(card.dataset.area) || 0;
+                if (area < areaMin || area > areaMax) show = false;
+                
+                if (parseInt(card.dataset.bedrooms) < bedroomsMin) show = false;
+                if (parseInt(card.dataset.bathrooms) < bathroomsMin) show = false;
+                
+                if (selectedFeatures.length > 0) {
+                    const features = card.dataset.features || '';
+                    if (!selectedFeatures.every(f => features.toLowerCase().includes(f.toLowerCase()))) {
+                        show = false;
+                    }
+                }
+                
+                card.style.display = show ? '' : 'none';
+                if (show) visibleCount++;
+            });
+            
+            propertyStats.textContent = `${visibleCount} объектов`;
+            updateActiveFilters();
+        }
+
+        function applyAdvancedFilters() {
+            const selectedType = document.querySelector('input[name="property-type"]:checked');
+            
+            activeFilters = {
+                type: selectedType?.value || '',
+                price: `${document.getElementById('price-min').value || 0}-${document.getElementById('price-max').value || 10000000}`,
+                bedrooms: document.getElementById('bedrooms-filter').value,
+                bathrooms: document.getElementById('bathrooms-filter').value,
+                features: Array.from(document.querySelectorAll('.feature-checkbox:checked')).map(cb => cb.value).join(',')
+            };
+            
+            filterProperties();
+            toggleFilterModal();
+        }
+
+        function resetAllFilters() {
+            // Сброс типа
+            document.querySelector('input[name="property-type"][value=""]').checked = true;
+            
+            // Сброс цены
+            priceMin.value = 0;
+            priceMax.value = 10000000;
+            updatePriceSliders();
+            
+            // Сброс площади
+            areaMin.value = 0;
+            areaMax.value = 500;
+            updateAreaSliders();
+            
+            // Сброс спален и ванных
+            document.querySelectorAll('#bedrooms-buttons .filter-option-btn, #bathrooms-buttons .filter-option-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('bedrooms-filter').value = '';
+            document.getElementById('bathrooms-filter').value = '';
+            document.getElementById('floor-filter').value = '';
+            
+            // Сброс удобств
+            document.querySelectorAll('.feature-checkbox').forEach(cb => cb.checked = false);
+            
+            if (searchInput) searchInput.value = '';
+            
+            activeFilters = {};
+            updateFilterCount();
+            filterProperties();
+        }
+
+        function updateActiveFilters() {
+            const filters = [];
+            
+            if (searchInput?.value) {
+                filters.push(`Поиск: "${searchInput.value}"`);
+            }
+            
+            const typeValue = document.querySelector('input[name="property-type"]:checked')?.value;
+            if (typeValue) filters.push(`Тип: ${typeValue}`);
+            
+            const priceMin = document.getElementById('price-min')?.value;
+            const priceMax = document.getElementById('price-max')?.value;
+            if (priceMin > 0 || priceMax < 10000000) {
+                filters.push(`Цена: $${priceMin || 0} - $${priceMax >= 10000000 ? '10M+' : priceMax}`);
+            }
+            
+            const areaMin = document.getElementById('area-min')?.value;
+            const areaMax = document.getElementById('area-max')?.value;
+            if (areaMin > 0 || areaMax < 500) {
+                filters.push(`Площадь: ${areaMin || 0} - ${areaMax >= 500 ? '500+' : areaMax} м²`);
+            }
+            
+            const bedrooms = document.getElementById('bedrooms-filter')?.value;
+            if (bedrooms) filters.push(`Спальни: ${bedrooms}+`);
+            
+            const bathrooms = document.getElementById('bathrooms-filter')?.value;
+            if (bathrooms) filters.push(`Ванные: ${bathrooms}+`);
+            
+            const selectedFeatures = Array.from(document.querySelectorAll('.feature-checkbox:checked')).map(cb => cb.value);
+            if (selectedFeatures.length > 0) {
+                filters.push(`Удобства: ${selectedFeatures.length}`);
+            }
+            
+            activeFiltersDiv.innerHTML = filters.map(f => 
+                `<span class="filter-tag">${f}<button class="remove-filter" onclick="resetAllFilters()">×</button></span>`
+            ).join('');
+        }
+
+        if (searchInput) searchInput.addEventListener('input', filterProperties);
+        
+        document.addEventListener('keydown', (e) => { 
+            if (e.key === 'Escape' && filterModal.classList.contains('active')) {
+                toggleFilterModal();
+            }
+        });
+
+        // Инициализация
+        filterProperties();
+        updateFilterCount();
+    </script>
+</body>
+</html>
