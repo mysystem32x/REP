@@ -7,6 +7,8 @@
     <!-- Подключение внешнего CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <!-- Шрифты -->
+    <link rel="icon" href="/static/images/favicon.svg" type="image/svg+xml">
+
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -142,8 +144,10 @@
             <a href="/admin" class="nav-link {% if request.path == '/admin' %}nav-active{% endif %}">Панель управления</a>
         </div>
         <div class="mobile-contact-info">
-            <p>📞 Связаться</p>
-            <a href="tel:+905543323396">+90 554 332 33 96</a>
+        <p>📞 Связаться</p>
+                <a href="tel:+905543323396">+90 554 332 33 96</a>
+                <p style="margin-top: 15px;">✉️ Почта</p>
+        <a href="mailto:anastasiiainvestor@gmail.com">anastasiiainvestor@gmail.com</a>
         </div>
     </nav>
 

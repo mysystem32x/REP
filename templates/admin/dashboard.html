@@ -7,6 +7,8 @@
     <!-- Подключение внешнего CSS (style.css) -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <!-- Шрифты -->
+              <link rel="icon" href="/static/images/favicon.svg" type="image/svg+xml">
+
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         /* ===== ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ТОЛЬКО ДЛЯ АДМИНКИ ===== */
@@ -415,31 +417,11 @@
                     <a href="/admin/logout" class="admin-link-btn logout">Выход</a>
                 </div>
                 <!-- Бургер-кнопка -->
-                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Меню">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
+
             </div>
         </div>
     </header>
 
-    <!-- ===== МОБИЛЬНОЕ МЕНЮ ===== -->
-    <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
-    <nav class="mobile-nav" id="mobileNav">
-        <a href="/" class="nav-link">Главная</a>
-        <a href="/properties" class="nav-link">Объекты</a>
-        <a href="/about" class="nav-link">О нас</a>
-        <a href="/contacts" class="nav-link">Контакты</a>
-        <a href="/admin" class="nav-link admin-link">✦ Админ-панель</a>
-        <a href="/admin/logout" class="nav-link admin-link">🚪 Выход</a>
-        
-        <div class="mobile-contact-info">
-            <p>📞 Связаться</p>
-        <a href="tel:+905543323396">+90 554 332 33 96</a>
-            <a href="mailto:info@respecthome.com">info@respecthome.com</a>
-        </div>
-    </nav>
 
     <!-- ===== ОСНОВНОЙ КОНТЕНТ ===== -->
     <main>
@@ -470,7 +452,7 @@
                         <tr>
                             <td><strong>{{ property.name[:40] }}{% if property.name|length > 40 %}...{% endif %}</strong></td>
                             <td>{{ property.location }}</td>
-                            <td class="price-cell">${{ "{:,.0f}".format(property.price) }}</td>
+                            <td class="price-cell">€{{ "{:,.0f}".format(property.price) }}</td>
                             <td><span class="type-badge">{{ property.property_type }}</span></td>
                             <td>{{ property.category }}</td>
                             <td>{{ property.area }} м²</td>

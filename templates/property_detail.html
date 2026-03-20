@@ -9,6 +9,8 @@
     <!-- Leaflet CSS для карты -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
     <!-- Шрифты -->
+              <link rel="icon" href="/static/images/favicon.svg" type="image/svg+xml">
+
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -700,7 +702,7 @@
 
             <div class="header-actions">
                 <div class="contact-info">
-                    <a href="tel:+905559460190" class="phone">+90 554 332 33 96</a>
+                    <a href="tel:+905543323396" class="phone">+90 554 332 33 96</a>
                 </div>
                 
                 <!-- Бургер-кнопка -->
@@ -721,10 +723,14 @@
             <a href="/properties" class="nav-link {% if request.path.startswith('/properties') %}nav-active{% endif %}">Объекты</a>
             <a href="/about" class="nav-link {% if request.path == '/about' %}nav-active{% endif %}">О нас</a>
             <a href="/contacts" class="nav-link {% if request.path == '/contacts' %}nav-active{% endif %}">Контакты</a>
+            <a href="/admin" class="nav-link {% if request.path == '/admin' %}nav-active{% endif %}">Панель управления</a>
+
         </div>
         <div class="mobile-contact-info">
             <p>📞 Связаться</p>
             <a href="tel:+905543323396">+90 554 332 33 96</a>
+                       <p style="margin-top: 15px;">✉️ Почта</p>
+        <a href="mailto:anastasiiainvestor@gmail.com">anastasiiainvestor@gmail.com</a>
         </div>
     </nav>
 
@@ -808,7 +814,7 @@
                         </div>
 
                         <div class="detail-price">
-                            ${{ "{:,.0f}".format(property.price) }}
+                            €{{ "{:,.0f}".format(property.price) }}
                         </div>
 
                         <div class="detail-specs-grid">
@@ -867,7 +873,7 @@
                         <div class="seller-contacts">
                             <h3>Связаться с продавцом</h3>
                             <div class="contact-buttons">
-                                <a href="https://wa.me/+905543323396?text=Здравствуйте! Меня интересует объект: {{ property.name }}"
+                                <a href="https://wa.me/+905543323396?text=Здравствуйте!%20Меня%20интересует%20объект:%20{{ property.name }}%0A{{ request.url | urlencode }}"
                                    target="_blank"
                                    class="contact-button whatsapp">
                                     <svg viewBox="0 0 24 24"><path d="M19.077 4.928C17.191 3.041 14.683 2 12.006 2 6.798 2 2.548 6.193 2.54 11.393c-.003 1.747.456 3.457 1.328 4.985L2.25 21.75l5.422-1.56c1.473.86 3.136 1.317 4.85 1.32h.004c5.19 0 9.456-4.194 9.464-9.396.004-2.512-.972-4.876-2.86-6.763zM12.01 20.04h-.003c-1.497-.001-2.965-.405-4.246-1.167l-.304-.181-3.345.962 1.003-3.236-.177-.315c-.824-1.334-1.26-2.873-1.258-4.45.007-4.318 3.518-7.83 7.842-7.83 2.099 0 4.069.82 5.551 2.308 1.482 1.488 2.298 3.456 2.295 5.535-.007 4.32-3.518 7.83-7.838 7.83zm4.306-6.027c-.236-.118-1.395-.688-1.61-.767-.216-.078-.373-.118-.53.118-.157.235-.61.767-.748.924-.137.157-.274.176-.51.059-.944-.442-1.56-.788-2.184-1.586-.823-.93-1.38-2.033-1.542-2.38-.162-.346-.017-.534.122-.706.125-.154.274-.352.412-.528.137-.176.183-.294.275-.49.092-.196.046-.353-.023-.512-.069-.158-.53-1.275-.726-1.746-.191-.46-.385-.398-.53-.405-.136-.007-.292-.008-.45-.008-.157 0-.412.059-.628.294-.216.235-.824.805-.824 1.964 0 1.158.844 2.277.962 2.434.118.157 1.616 2.58 3.998 3.525 2.382.944 2.382.63 2.812.59.43-.04 1.388-.568 1.584-1.116.196-.548.196-1.018.137-1.116-.058-.098-.215-.157-.45-.274z"/></svg>
@@ -882,14 +888,11 @@
                             </div>
                             <div class="contact-divider"><span>или позвоните</span></div>
                             <a href="tel:+905543323396" style="color: var(--text-color); text-decoration: none; display: block; text-align: center; font-size: 20px; font-weight: 600; letter-spacing: 0.5px;">
-                                +90 555 946 0190
+                                +90 554 332 33 96
                             </a>
                         </div>
 
-                        <div class="detail-contact">
-                            <button class="contact-button" onclick="showContactForm()">Запросить информацию</button>
-                            <a href="/properties" class="back-link">Вернуться к объектам</a>
-                        </div>
+
                     </div>
                 </div>
             </div>
@@ -1143,7 +1146,7 @@
                         <div class="property-card">
                             <div class="property-image-wrapper">
                                 <img src="${p.image}" alt="${p.name}" class="property-image">
-                                <div class="price-badge">$${p.price.toLocaleString()}</div>
+                                <div class="price-badge">€${p.price.toLocaleString()}</div>
                                 <div class="property-overlay">
                                     <a href="/property/${p.id}" class="view-details">Подробнее</a>
                                 </div>

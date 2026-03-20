@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+             <link rel="icon" href="/static/images/favicon.svg" type="image/svg+xml">
+
 </head>
 <body>
     <!-- ===== HEADER ===== -->
@@ -53,10 +55,13 @@
             <a href="/properties" class="nav-link {% if request.path.startswith('/properties') %}nav-active{% endif %}">Объекты</a>
             <a href="/about" class="nav-link {% if request.path == '/about' %}nav-active{% endif %}">О нас</a>
             <a href="/contacts" class="nav-link {% if request.path == '/contacts' %}nav-active{% endif %}">Контакты</a>
+            <a href="/admin" class="nav-link {% if request.path == '/admin' %}nav-active{% endif %}">Панель управления</a>
         </div>
         <div class="mobile-contact-info">
-            <p>📞 Связаться</p>
-        <a href="tel:+905543323396">+90 554 332 33 96</a>
+        <p>📞 Связаться</p>
+            <a href="tel:+905543323396">+90 554 332 33 96</a>
+            <p style="margin-top: 15px;">✉️ Почта</p>
+            <a href="mailto:anastasiiainvestor@gmail.com">anastasiiainvestor@gmail.com</a>
         </div>
     </nav>
 
@@ -109,7 +114,7 @@
                              data-features="{{ property.features|lower if property.features else '' }}">
                             <div class="property-image-wrapper">
                                 <img src="{{ property.image }}" alt="{{ property.name }}" class="property-image">
-                                <div class="property-price-tag">${{ "{:,.0f}".format(property.price) }}</div>
+                                <div class="property-price-tag">€{{ "{:,.0f}".format(property.price) }}</div>
                                 <div class="property-overlay">
                                     <a href="/property/{{ property.id }}" class="view-details">Подробнее</a>
                                 </div>
@@ -135,7 +140,7 @@
                                     </span>
                                 </div>
                                 <div class="property-footer">
-                                    <span class="property-price">${{ "{:,.0f}".format(property.price) }}</span>
+                                    <span class="property-price">€{{ "{:,.0f}".format(property.price) }}</span>
                                     <span class="property-type">{{ property.property_type }}</span>
                                 </div>
                             </div>
@@ -199,7 +204,7 @@
             </div>
 
             <div class="filter-group">
-                <label><i class="fas fa-dollar-sign" style="margin-right: 8px;"></i>Цена ($)</label>
+                <label><i class="fas fa-dollar-sign" style="margin-right: 8px;"></i>Цена (€)</label>
                 <div class="range-slider">
                     <div class="range-values">
                         <span id="price-min-display">0</span> - <span id="price-max-display">10M+</span>
