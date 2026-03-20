@@ -171,7 +171,7 @@
             <nav class="desktop-nav">
                 <ul class="nav-menu">
                     <li><a href="/" class="{% if request.path == '/' %}active{% endif %}">Главная</a></li>
-                    <li><a href="/properties" class="{% if request.path.startswith('/properties') %}active{% endif %}">Объекты</a></li>
+                    <li><a href="/novostroy" class="{% if request.path.startswith('/novostroy') %}active{% endif %}">Объекты</a></li>
                     <li><a href="/about" class="{% if request.path == '/about' %}active{% endif %}">О нас</a></li>
                     <li><a href="/contacts" class="{% if request.path == '/contacts' %}active{% endif %}">Контакты</a></li>
                     <li><a href="/admin" class="{% if request.path == '/admin' %}active{% endif %}">Панель управления</a></li>
@@ -197,7 +197,7 @@
     <nav class="mobile-nav" id="mobileNav">
         <div class="mobile-nav-links">
             <a href="/" class="nav-link {% if request.path == '/' %}nav-active{% endif %}">Главная</a>
-            <a href="/properties" class="nav-link {% if request.path.startswith('/properties') %}nav-active{% endif %}">Объекты</a>
+            <a href="/novostroy" class="nav-link {% if request.path.startswith('/novostroy') %}nav-active{% endif %}">Объекты</a>
             <a href="/about" class="nav-link {% if request.path == '/about' %}nav-active{% endif %}">О нас</a>
             <a href="/contacts" class="nav-link {% if request.path == '/contacts' %}nav-active{% endif %}">Контакты</a>
             <a href="/admin" class="nav-link {% if request.path == '/admin' %}nav-active{% endif %}">Панель управления</a>
@@ -301,7 +301,7 @@
                     <p>Свяжитесь с нами для консультации</p>
                     <div class="cta-buttons">
                         <a href="/contacts" class="cta-button primary">Связаться</a>
-                        <a href="/properties" class="cta-button secondary">Смотреть объекты</a>
+                        <a href="/novostroy" class="cta-button secondary">Смотреть объекты</a>
                     </div>
                 </div>
             </div>
@@ -318,7 +318,7 @@
                 </div>
                 <div class="footer-section fade-in-left delay-2">
                     <h3>Навигация</h3>
-                    <a href="/properties">Объекты</a>
+                    <a href="/novostroy">Объекты</a>
                     <a href="/about">О нас</a>
                     <a href="/contacts">Контакты</a>
                 </div>

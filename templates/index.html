@@ -7,8 +7,106 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <!-- Премиальный шрифт для тайтла -->
-         <link rel="icon" href="/static/images/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/static/images/favicon.svg" type="image/svg+xml">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Дополнительные стили для анимации скролла */
+        .scroll-hint {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            cursor: pointer;
+            animation: bounce 2s infinite;
+            transition: opacity 0.3s ease;
+        }
+        
+        .scroll-hint:hover {
+            opacity: 0.7;
+        }
+        
+        .scroll-hint .mouse {
+            width: 30px;
+            height: 50px;
+            border: 2px solid var(--accent-color);
+            border-radius: 20px;
+            position: relative;
+            margin: 0 auto;
+        }
+        
+        .scroll-hint .wheel {
+            width: 4px;
+            height: 8px;
+            background: var(--accent-color);
+            border-radius: 2px;
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: scroll 1.5s infinite;
+        }
+        
+        .scroll-hint .arrow-down {
+            text-align: center;
+            margin-top: 8px;
+            color: var(--accent-color);
+            font-size: 20px;
+        }
+        
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            50% {
+                transform: translateX(-50%) translateY(-10px);
+            }
+        }
+        
+        @keyframes scroll {
+            0% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(15px);
+            }
+        }
+        
+        /* Стили для плавного скролла */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Анимация появления категорий */
+        .categories {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+        
+        .categories.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Стили для кнопки скролла */
+        .hero-section {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Запрещаем скролл на hero секции до первого скролла */
+        body.no-scroll {
+            overflow: hidden;
+        }
+        
+        /* Убираем скролл бар во время блокировки */
+        body.no-scroll .hero-section {
+            overflow-y: auto;
+        }
+    </style>
 </head>
 <body>
 
@@ -23,11 +121,10 @@
         <nav class="desktop-nav">
             <ul class="nav-menu">
                 <li><a href="/" class="active">Главная</a></li>
-                <li><a href="/properties">Объекты</a></li>
+                <li><a href="/novostroy">Объекты</a></li>
                 <li><a href="/about">О нас</a></li>
                 <li><a href="/contacts">Контакты</a></li>
                 <li><a href="/admin">Панель управления</a></li>
-
             </ul>
         </nav>
 
@@ -49,7 +146,7 @@
 <nav class="mobile-nav" id="mobileNav">
     <div class="mobile-nav-links">
         <a href="/" class="nav-link nav-active">Главная</a>
-        <a href="/properties" class="nav-link">Объекты</a>
+        <a href="/novostroy" class="nav-link">Объекты</a>
         <a href="/about" class="nav-link">О нас</a>
         <a href="/contacts" class="nav-link">Контакты</a>
         <a href="/admin" class="nav-link admin-link">Панель управления</a>
@@ -64,7 +161,7 @@
 </nav>
 
 <main>
-    <section class="hero-section">
+    <section class="hero-section" id="heroSection">
         <div class="hero-overlay"></div>
         
         <div class="container hero-container">
@@ -77,14 +174,19 @@
                     Премиальная недвижимость в лучших локациях Аланьи: <br>
                     от роскошных пентхаусов с панорамным видом на Средиземное море до элитных вилл у подножия Таврских гор.
                 </p>
-                <div class="hero-actions">
-                    <a href="/properties" class="hero-button gold-glow">СМОТРЕТЬ ОБЪЕКТЫ</a>
-                </div>
             </div>
+        </div>
+        
+        <!-- Кнопка для скролла вниз -->
+        <div class="scroll-hint" id="scrollHint">
+            <div class="mouse">
+                <div class="wheel"></div>
+            </div>
+            <div class="arrow-down">↓</div>
         </div>
     </section>
 
-    <section class="categories">
+    <section class="categories" id="categoriesSection">
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">Категории недвижимости</h2>
@@ -92,16 +194,30 @@
             </div>
             <div class="categories-grid">
                 {% for category in categories %}
-                <a href="/properties?category={{ category.slug }}" class="category-card">
-                    <div class="category-image-wrapper">
-                        <img src="{{ category.image }}" alt="{{ category.name }}" class="category-image">
-                        <div class="category-overlay"></div>
-                    </div>
-                    <div class="category-info">
-                        <h3 class="category-name">{{ category.name }}</h3>
-                        <span class="category-arrow">→</span>
-                    </div>
-                </a>
+                    {% if category.slug == 'новостройки' %}
+                    <a href="/novostroy" class="category-card">
+                    {% elif category.slug == 'вторичка' %}
+                    <a href="/secondary" class="category-card">
+                    {% elif category.slug == 'аренда' %}
+                    <a href="/rent" class="category-card">
+                    {% elif category.slug == 'гражданство' %}
+                    <a href="/passport" class="category-card">
+                    {% elif category.slug == 'внж' %}
+                    <a href="/vng" class="category-card">
+                    {% elif category.slug == 'интерьер' %}
+                    <a href="/interier" class="category-card">
+                    {% else %}
+                    <a href="/properties?category={{ category.slug }}" class="category-card">
+                    {% endif %}
+                        <div class="category-image-wrapper">
+                            <img src="{{ category.image }}" alt="{{ category.name }}" class="category-image">
+                            <div class="category-overlay"></div>
+                        </div>
+                        <div class="category-info">
+                            <h3 class="category-name">{{ category.name }}</h3>
+                            <span class="category-arrow">→</span>
+                        </div>
+                    </a>
                 {% endfor %}
             </div>
         </div>
@@ -144,7 +260,7 @@
                 <p>Свяжитесь с нашей командой экспертов прямо сейчас</p>
                 <div class="cta-buttons">
                     <a href="/contacts" class="cta-button primary">Связаться</a>
-                    <a href="/properties" class="cta-button secondary">Все объекты</a>
+                    <a href="/novostroy" class="cta-button secondary">Все объекты</a>
                 </div>
             </div>
         </div>
@@ -160,7 +276,7 @@
             </div>
             <div class="footer-section">
                 <h3>Навигация</h3>
-                <a href="/properties">Объекты</a>
+                <a href="/novostroy">Объекты</a>
                 <a href="/about">О нас</a>
                 <a href="/contacts">Контакты</a>
             </div>
@@ -180,6 +296,7 @@
 <script>
     (function() {
         document.addEventListener('DOMContentLoaded', function() {
+            // ===== МОБИЛЬНОЕ МЕНЮ =====
             const mobileMenuToggle = document.getElementById('mobileMenuToggle');
             const mobileNav = document.getElementById('mobileNav');
             const mobileNavOverlay = document.getElementById('mobileNavOverlay');
@@ -228,7 +345,7 @@
                 }
             });
 
-            // Добавляем анимацию для букв тайтла (опционально)
+            // ===== АНИМАЦИЯ БУКВ ТАЙТЛА =====
             const title = document.querySelector('.main-hero-title');
             if (title) {
                 const text = title.textContent;
@@ -236,6 +353,154 @@
                 title.innerHTML = letters.map((letter, i) => 
                     `<span style="--i: ${i}">${letter === ' ' ? '&nbsp;' : letter}</span>`
                 ).join('');
+            }
+            
+            // ===== СКРОЛЛ К КАТЕГОРИЯМ ПРИ ЛЮБОМ ДВИЖЕНИИ =====
+            const categoriesSection = document.getElementById('categoriesSection');
+            const heroSection = document.getElementById('heroSection');
+            let hasScrolled = false;
+            
+            // Функция для плавного скролла к категориям
+            function scrollToCategories() {
+                if (hasScrolled) return; // Если уже скроллили, больше не выполняем
+                if (!categoriesSection) return;
+                
+                hasScrolled = true;
+                
+                const offset = -50; // Небольшой отступ сверху
+                const elementPosition = categoriesSection.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - offset;
+                
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+                
+                // Убираем блокировку скролла после перехода
+                setTimeout(() => {
+                    document.body.classList.remove('no-scroll');
+                }, 500);
+            }
+            
+            // Обработчик прокрутки колесиком мыши (настольные)
+            function handleWheel(e) {
+                if (hasScrolled) return;
+                
+                // При любом движении колесика (даже на 1 пиксель) скроллим к категориям
+                if (e.deltaY !== 0) {
+                    e.preventDefault();
+                    scrollToCategories();
+                }
+            }
+            
+            // Обработчик тач-событий для мобильных устройств
+            let touchStartY = 0;
+            let touchEndY = 0;
+            
+            function handleTouchStart(e) {
+                if (hasScrolled) return;
+                touchStartY = e.touches[0].clientY;
+            }
+            
+            function handleTouchMove(e) {
+                if (hasScrolled) return;
+                touchEndY = e.touches[0].clientY;
+                const deltaY = touchStartY - touchEndY;
+                
+                // При любом движении пальцем вниз (даже на 1 пиксель) скроллим к категориям
+                if (deltaY > 0) {
+                    e.preventDefault();
+                    scrollToCategories();
+                }
+            }
+            
+            // Обработчик клика на кнопку скролла
+            const scrollHint = document.getElementById('scrollHint');
+            if (scrollHint) {
+                scrollHint.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    scrollToCategories();
+                });
+            }
+            
+            // Блокируем обычный скролл на hero секции
+            function blockScrollOnHero() {
+                const heroHeight = heroSection ? heroSection.offsetHeight : window.innerHeight;
+                const currentScroll = window.pageYOffset;
+                
+                if (currentScroll < heroHeight - 50 && !hasScrolled) {
+                    document.body.classList.add('no-scroll');
+                } else {
+                    document.body.classList.remove('no-scroll');
+                }
+            }
+            
+            // Добавляем обработчики событий
+            window.addEventListener('wheel', handleWheel, { passive: false });
+            window.addEventListener('touchstart', handleTouchStart);
+            window.addEventListener('touchmove', handleTouchMove, { passive: false });
+            
+            // Автоматический скролл через 3 секунды (если пользователь не скроллил)
+            setTimeout(function() {
+                if (!hasScrolled) {
+                    scrollToCategories();
+                }
+            }, 3000);
+            
+            // Отслеживаем скролл, чтобы разблокировать страницу после перехода
+            window.addEventListener('scroll', function() {
+                if (hasScrolled) {
+                    document.body.classList.remove('no-scroll');
+                } else {
+                    blockScrollOnHero();
+                }
+            });
+            
+            // Анимация появления категорий при скролле
+            const categoriesBlock = document.querySelector('.categories');
+            
+            function checkVisibility() {
+                if (!categoriesBlock) return;
+                
+                const rect = categoriesBlock.getBoundingClientRect();
+                const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+                
+                if (rect.top <= windowHeight - 100) {
+                    categoriesBlock.classList.add('visible');
+                }
+            }
+            
+            checkVisibility();
+            window.addEventListener('scroll', checkVisibility);
+            
+            // Скрываем кнопку скролла после перехода
+            const scrollHintElement = document.getElementById('scrollHint');
+            function hideScrollHint() {
+                if (scrollHintElement) {
+                    scrollHintElement.style.opacity = '0';
+                    setTimeout(() => {
+                        if (scrollHintElement) scrollHintElement.style.display = 'none';
+                    }, 300);
+                }
+            }
+            
+            // Если уже проскроллили, скрываем кнопку
+            if (window.pageYOffset > 100) {
+                hideScrollHint();
+            }
+            
+            // Наблюдатель за появлением категорий
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        hideScrollHint();
+                        observer.disconnect();
+                    }
+                });
+            }, { threshold: 0.3 });
+            
+            if (categoriesSection) {
+                observer.observe(categoriesSection);
             }
         });
     })();

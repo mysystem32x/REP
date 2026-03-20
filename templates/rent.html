@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Аренда | Respect Home</title>
+    <!-- Подключение внешнего CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Шрифты -->
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" href="/static/images/favicon.svg" type="image/svg+xml">
+    <style>
+        /* Дополнительные стили для страницы аренды */
+        .category-header {
+            padding: 150px 0 50px;
+            background: linear-gradient(to bottom, rgba(17,12,9,0.95) 0%, var(--bg-color) 100%);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .category-title {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-color);
+            font-family: var(--font-title);
+            letter-spacing: 2px;
+            text-align: center;
+        }
+
+        .category-description {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+
+        /* Стили для кнопок-переключателей */
+        .category-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 50px;
+            flex-wrap: wrap;
+        }
+
+        .category-tab-btn {
+            padding: 14px 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 50px;
+            color: var(--text-color);
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: var(--font-main);
+            letter-spacing: 1px;
+        }
+
+        .category-tab-btn:hover {
+            background: rgba(212, 165, 116, 0.15);
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        .category-tab-btn.active {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border-color: var(--accent-color);
+            box-shadow: 0 5px 20px rgba(212, 165, 116, 0.4);
+        }
+
+        /* Секция с объектами */
+        .properties-section-category {
+            padding: 0 0 80px;
+        }
+
+        .properties-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            padding: 30px 0;
+        }
+
+        /* Адаптация для планшетов */
+        @media screen and (min-width: 768px) and (max-width: 1024px) {
+            .properties-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+        }
+
+        /* Адаптация для мобильных */
+        @media screen and (max-width: 767px) {
+            .category-header {
+                padding: 120px 0 30px;
+            }
+            
+            .category-title {
+                font-size: 32px;
+            }
+            
+            .category-description {
+                font-size: 14px;
+                padding: 0 20px;
+            }
+            
+            .category-tabs {
+                gap: 12px;
+                margin-bottom: 30px;
+            }
+            
+            .category-tab-btn {
+                padding: 10px 25px;
+                font-size: 14px;
+            }
+            
+            .properties-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+                padding: 15px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .properties-grid {
+                grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+                gap: 12px;
+                padding: 10px;
+            }
+        }
+
+        @media screen and (max-width: 360px) {
+            .properties-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+
+        /* Статистика */
+        .stats-badge-category {
+            background: rgba(212, 165, 116, 0.2);
+            border: 1px solid var(--accent-color);
+            border-radius: 30px;
+            padding: 8px 20px;
+            font-size: 14px;
+            color: var(--accent-color);
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .no-results-category {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            opacity: 0.8;
+        }
+
+        .no-results-category i {
+            font-size: 48px;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .no-results-category h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+        }
+
+        .no-results-category p {
+            font-size: 14px;
+            opacity: 0.6;
+        }
+
+        /* Бейдж "Аренда" */
+        .rent-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: #25D366;
+            color: var(--bg-color);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            z-index: 2;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        /* Анимация загрузки */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .property-card {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        /* Специфичные стили для аренды */
+        .price-rent {
+            color: #25D366;
+        }
+        
+        .rent-period {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== HEADER ===== -->
+    <header class="main-header">
+        <div class="container header-content">
+            <div class="logo-section">
+                <a href="/" style="text-decoration: none; display: flex; align-items: center;">
+                    <img src="/static/images/logo.png" alt="Respect Home" class="main-logo">
+                </a>
+            </div>
+
+            <nav class="desktop-nav">
+                <ul class="nav-menu">
+                    <li><a href="/">Главная</a></li>
+                    <li><a href="/novostroy" class="active">Объекты</a></li>
+                    <li><a href="/about">О нас</a></li>
+                    <li><a href="/contacts">Контакты</a></li>
+                    <li><a href="/admin">Панель управления</a></li>
+                </ul>
+            </nav>
+
+            <div class="header-actions">
+                <div class="contact-info">
+                    <a href="tel:+905554332396" class="phone">+90 554 332 33 96</a>
+                </div>
+                
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Меню">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Мобильное меню -->
+    <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+    <nav class="mobile-nav" id="mobileNav">
+        <div class="mobile-nav-links">
+            <a href="/" class="nav-link">Главная</a>
+            <a href="/novostroy" class="nav-link nav-active">Объекты</a>
+            <a href="/about" class="nav-link">О нас</a>
+            <a href="/contacts" class="nav-link">Контакты</a>
+            <a href="/admin" class="nav-link">Панель управления</a>
+        </div>
+        <div class="mobile-contact-info">
+            <p>📞 Связаться</p>
+            <a href="tel:+905543323396">+90 554 332 33 96</a>
+            <p style="margin-top: 15px;">✉️ Почта</p>
+            <a href="mailto:anastasiiainvestor@gmail.com">anastasiiainvestor@gmail.com</a>
+        </div>
+    </nav>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main>
+        <section class="category-header">
+            <div class="container">
+                <h1 class="category-title">Аренда недвижимости в Турции</h1>
+                <p class="category-description">
+                    Долгосрочная и посуточная аренда в Аланье и других городах<br>
+                    Выберите тип недвижимости для просмотра
+                </p>
+                
+                <!-- Кнопки-переключатели -->
+                <div class="category-tabs">
+                    <button class="category-tab-btn active" data-type="all">Все объекты</button>
+                    <button class="category-tab-btn" data-type="Вилла">Виллы</button>
+                    <button class="category-tab-btn" data-type="Квартира">Квартиры</button>
+                </div>
+                
+                <div style="text-align: center;">
+                    <span class="stats-badge-category" id="property-stats">0 объектов</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="properties-section-category">
+            <div class="container">
+                <div class="properties-grid" id="properties-grid">
+                    {% if properties %}
+                        {% for property in properties %}
+                        <div class="property-card"
+                             data-id="{{ property.id }}"
+                             data-type="{{ property.property_type }}"
+                             data-price="{{ property.price }}"
+                             data-name="{{ property.name | lower }}"
+                             data-location="{{ property.location | lower }}"
+                             data-area="{{ property.area }}"
+                             data-bedrooms="{{ property.bedrooms }}"
+                             data-bathrooms="{{ property.bathrooms }}"
+                             data-features="{{ property.features|lower if property.features else '' }}">
+                            <div class="property-image-wrapper">
+                                <img src="{{ property.image }}" alt="{{ property.name }}" class="property-image" onerror="this.src='/static/images/placeholder.jpg'">
+                                <div class="property-price-tag price-rent">€{{ "{:,.0f}".format(property.price) }}<span class="rent-period">/мес</span></div>
+                                <div class="rent-badge">Аренда</div>
+                                <div class="property-overlay">
+                                    <a href="/property/{{ property.id }}" class="view-details">Подробнее</a>
+                                </div>
+                            </div>
+                            <div class="property-info">
+                                <h3 class="property-name">{{ property.name }}</h3>
+                                <p class="property-location">
+                                    <i class="fas fa-map-marker-alt" style="color: var(--accent-color);"></i>
+                                    {{ property.location }}
+                                </p>
+                                <div class="property-specs">
+                                    <span class="spec-item">
+                                        <i class="fas fa-ruler-combined"></i>
+                                        {{ property.area }} м²
+                                    </span>
+                                    <span class="spec-item">
+                                        <i class="fas fa-bed"></i>
+                                        {{ property.bedrooms }}
+                                    </span>
+                                    <span class="spec-item">
+                                        <i class="fas fa-bath"></i>
+                                        {{ property.bathrooms }}
+                                    </span>
+                                </div>
+                                <div class="property-footer">
+                                    <span class="property-price price-rent">€{{ "{:,.0f}".format(property.price) }}<span class="rent-period">/мес</span></span>
+                                    <span class="property-type">{{ property.property_type }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="no-results-category">
+                            <i class="fas fa-home"></i>
+                            <h3>Объектов не найдено</h3>
+                            <p>В категории аренды пока нет объектов</p>
+                            <p style="margin-top: 20px; font-size: 13px;">Свяжитесь с нами для подбора вариантов</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3>Respect Home</h3>
+                    <p>Ведущее агентство по недвижимости в Турции</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Навигация</h3>
+                    <a href="/novostroy">Объекты</a>
+                    <a href="/about">О нас</a>
+                    <a href="/contacts">Контакты</a>
+                </div>
+                <div class="footer-section">
+                    <h3>Социальные сети</h3>
+                    <a href="https://www.tiktok.com/@anastasiia_respect_home">TikTok</a>
+                    <a href="https://www.instagram.com/respect_home_alanya">Instagram</a>
+                    <a href="https://api.whatsapp.com/send/?phone=905543323396">WhatsApp</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="copyright">Copyright © 2025 Respect Home</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        // Получаем все карточки из БД
+        const propertyCards = document.querySelectorAll('.property-card');
+        const propertyStats = document.getElementById('property-stats');
+        const tabButtons = document.querySelectorAll('.category-tab-btn');
+        
+        // Текущий выбранный тип
+        let currentType = 'all';
+        
+        // Функция обновления отображения
+        function filterAndDisplay() {
+            let visibleCount = 0;
+            
+            propertyCards.forEach(card => {
+                let show = true;
+                
+                if (currentType !== 'all') {
+                    const propertyType = card.dataset.type;
+                    if (propertyType !== currentType) {
+                        show = false;
+                    }
+                }
+                
+                card.style.display = show ? '' : 'none';
+                if (show) visibleCount++;
+            });
+            
+            // Обновляем статистику
+            propertyStats.textContent = `${visibleCount} ${getDeclension(visibleCount, 'объект', 'объекта', 'объектов')}`;
+        }
+        
+        // Функция склонения слов
+        function getDeclension(number, one, two, five) {
+            let n = Math.abs(number);
+            n %= 100;
+            if (n >= 5 && n <= 20) return five;
+            n %= 10;
+            if (n === 1) return one;
+            if (n >= 2 && n <= 4) return two;
+            return five;
+        }
+        
+        // Обработка переключения вкладок
+        function switchTab(type) {
+            currentType = type;
+            
+            // Обновляем активный класс на кнопках
+            tabButtons.forEach(btn => {
+                if (btn.dataset.type === type) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Фильтруем карточки
+            filterAndDisplay();
+        }
+        
+        // Добавляем обработчики на кнопки
+        tabButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                switchTab(btn.dataset.type);
+            });
+        });
+        
+        // Функция для подсчета изначальной статистики
+        function updateInitialStats() {
+            const totalCount = propertyCards.length;
+            propertyStats.textContent = `${totalCount} ${getDeclension(totalCount, 'объект', 'объекта', 'объектов')}`;
+        }
+        
+        // ===== МОБИЛЬНОЕ МЕНЮ =====
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const mobileNav = document.getElementById('mobileNav');
+            const mobileNavOverlay = document.getElementById('mobileNavOverlay');
+            
+            if (!mobileMenuToggle || !mobileNav || !mobileNavOverlay) return;
+            
+            function toggleMobileMenu() {
+                mobileMenuToggle.classList.toggle('active');
+                mobileNav.classList.toggle('active');
+                mobileNavOverlay.classList.toggle('active');
+                document.body.classList.toggle('menu-open');
+            }
+            
+            function closeMobileMenu() {
+                mobileMenuToggle.classList.remove('active');
+                mobileNav.classList.remove('active');
+                mobileNavOverlay.classList.remove('active');
+                document.body.classList.remove('menu-open');
+            }
+            
+            mobileMenuToggle.addEventListener('click', (e) => { 
+                e.preventDefault(); 
+                e.stopPropagation(); 
+                toggleMobileMenu(); 
+            });
+            
+            mobileNavOverlay.addEventListener('click', closeMobileMenu);
+            
+            if (mobileNav) {
+                mobileNav.querySelectorAll('.nav-link').forEach(link => 
+                    link.addEventListener('click', closeMobileMenu)
+                );
+            }
+            
+            window.addEventListener('resize', () => { 
+                if (window.innerWidth > 1024) closeMobileMenu(); 
+            });
+            
+            document.addEventListener('keydown', (e) => { 
+                if (e.key === 'Escape') closeMobileMenu(); 
+            });
+            
+            // Инициализация статистики
+            updateInitialStats();
+        });
+    </script>
+</body>
+</html>

@@ -931,9 +931,6 @@ footer {
                         <option value="">Выберите тип</option>
                         <option value="Квартира" {% if property and property.type == 'Квартира' %}selected{% endif %}>Квартира</option>
                         <option value="Вилла" {% if property and property.type == 'Вилла' %}selected{% endif %}>Вилла</option>
-                        <option value="Студия" {% if property and property.type == 'Студия' %}selected{% endif %}>Студия</option>
-                        <option value="Пентхаус" {% if property and property.type == 'Пентхаус' %}selected{% endif %}>Пентхаус</option>
-                        <option value="Комплекс" {% if property and property.type == 'Комплекс' %}selected{% endif %}>Комплекс</option>
                     </select>
                 </div>
                 <div class="form-section">
@@ -942,7 +939,10 @@ footer {
                         <option value="">Выберите категорию</option>
                         <option value="новостройки" {% if property and property.category == 'новостройки' %}selected{% endif %}>Новостройки</option>
                         <option value="вторичка" {% if property and property.category == 'вторичка' %}selected{% endif %}>Вторичка</option>
-                        <option value="инвестиции" {% if property and property.category == 'инвестиции' %}selected{% endif %}>Инвестиции</option>
+                        <option value="аренда" {% if property and property.category == 'аренда' %}selected{% endif %}>Аренда</option>
+                        <option value="гражданство" {% if property and property.category == 'гражданство' %}selected{% endif %}>Гражданство</option>
+                        <option value="внж" {% if property and property.category == 'внж' %}selected{% endif %}>ВНЖ</option>
+
                     </select>
                 </div>
             </div>

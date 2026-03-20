@@ -9,8 +9,7 @@
     <!-- Leaflet CSS для карты -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
     <!-- Шрифты -->
-              <link rel="icon" href="/static/images/favicon.svg" type="image/svg+xml">
-
+    <link rel="icon" href="/static/images/favicon.svg" type="image/svg+xml">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -136,6 +135,7 @@
             letter-spacing: 0.5px;
         }
 
+        /* Кнопки навигации галереи */
         .gallery-nav {
             position: absolute;
             top: 50%;
@@ -690,11 +690,10 @@
                 </a>
             </div>
 
-            <!-- Десктоп навигация с динамической подсветкой -->
             <nav class="desktop-nav">
                 <ul class="nav-menu">
                     <li><a href="/" class="{% if request.path == '/' %}active{% endif %}">Главная</a></li>
-                    <li><a href="/properties" class="{% if request.path.startswith('/properties') %}active{% endif %}">Объекты</a></li>
+                    <li><a href="/novostroy" class="{% if request.path.startswith('/novostroy') %}active{% endif %}">Объекты</a></li>
                     <li><a href="/about" class="{% if request.path == '/about' %}active{% endif %}">О нас</a></li>
                     <li><a href="/contacts" class="{% if request.path == '/contacts' %}active{% endif %}">Контакты</a></li>
                 </ul>
@@ -705,7 +704,6 @@
                     <a href="tel:+905543323396" class="phone">+90 554 332 33 96</a>
                 </div>
                 
-                <!-- Бургер-кнопка -->
                 <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Меню">
                     <span></span>
                     <span></span>
@@ -715,65 +713,51 @@
         </div>
     </header>
 
-    <!-- Мобильное меню с динамической подсветкой -->
     <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
     <nav class="mobile-nav" id="mobileNav">
         <div class="mobile-nav-links">
             <a href="/" class="nav-link {% if request.path == '/' %}nav-active{% endif %}">Главная</a>
-            <a href="/properties" class="nav-link {% if request.path.startswith('/properties') %}nav-active{% endif %}">Объекты</a>
+            <a href="/novostroy" class="nav-link {% if request.path.startswith('/novostroy') %}nav-active{% endif %}">Объекты</a>
             <a href="/about" class="nav-link {% if request.path == '/about' %}nav-active{% endif %}">О нас</a>
             <a href="/contacts" class="nav-link {% if request.path == '/contacts' %}nav-active{% endif %}">Контакты</a>
             <a href="/admin" class="nav-link {% if request.path == '/admin' %}nav-active{% endif %}">Панель управления</a>
-
         </div>
         <div class="mobile-contact-info">
             <p>📞 Связаться</p>
             <a href="tel:+905543323396">+90 554 332 33 96</a>
-                       <p style="margin-top: 15px;">✉️ Почта</p>
-        <a href="mailto:anastasiiainvestor@gmail.com">anastasiiainvestor@gmail.com</a>
+            <p style="margin-top: 15px;">✉️ Почта</p>
+            <a href="mailto:anastasiiainvestor@gmail.com">anastasiiainvestor@gmail.com</a>
         </div>
     </nav>
 
-    <!-- ===== MAIN CONTENT ===== -->
     <main>
-        <!-- Breadcrumb -->
         <section class="property-detail-hero">
             <div class="container">
                 <div class="breadcrumb">
-                    <a href="/">Главная</a> / <a href="/properties">Объекты</a> / <span>{{ property.name }}</span>
+                    <a href="/">Главная</a> / <a href="/novostroy">Объекты</a> / <span>{{ property.name }}</span>
                 </div>
             </div>
         </section>
 
-        <!-- Property Detail -->
         <section class="property-detail-section">
             <div class="container">
                 <div class="property-detail-content">
-                    <!-- Gallery -->
                     <div class="property-gallery">
                         <div id="mainImageContainer">
-                            {% if property.youtube_url %}
-                                {% set video_id = property.youtube_url.split('v=')[-1].split('&')[0] if 'v=' in property.youtube_url else property.youtube_url.split('/')[-1] %}
-                                <iframe id="youtube-frame" 
-                                        src="https://www.youtube.com/embed/{{ video_id }}?autoplay=0&rel=0&modestbranding=1" 
-                                        frameborder="0" 
-                                        allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                        allowfullscreen>
-                                </iframe>
-                            {% else %}
-                                <img id="main-image" src="{{ property.image }}" alt="{{ property.name }}">
-                            {% endif %}
+                            <!-- По умолчанию показываем главное изображение -->
+                            <img id="main-image" src="{{ property.image }}" alt="{{ property.name }}">
                             <div class="image-counter">
                                 <span id="currentImageNum">1</span> / <span id="totalImages">{{ (property.additional_images|length if property.additional_images else 0) + (1 if property.youtube_url else 1) }}</span>
                             </div>
                         </div>
 
-                        <button class="gallery-nav prev" onclick="navigateGallery(-1)" id="prevBtn" style="display: none;">‹</button>
-                        <button class="gallery-nav next" onclick="navigateGallery(1)" id="nextBtn" style="display: none;">›</button>
+                        <!-- Кнопки навигации -->
+                        <button class="gallery-nav prev" id="prevBtn">‹</button>
+                        <button class="gallery-nav next" id="nextBtn">›</button>
 
                         <div class="thumbnail-grid" id="thumbnailGrid">
-                            <!-- Главное изображение -->
-                            <div class="thumbnail {% if not property.youtube_url %}active{% endif %}" onclick="changeImage('{{ property.image }}', this, 0, 'image')">
+                            <!-- Главное изображение - активное -->
+                            <div class="thumbnail active" data-index="0" data-type="image" data-src="{{ property.image }}">
                                 <img src="{{ property.image }}" alt="Main">
                             </div>
 
@@ -781,17 +765,18 @@
                             {% if property.additional_images %}
                                 {% for img in property.get_additional_images() %}
                                     {% if img %}
-                                    <div class="thumbnail" onclick="changeImage('{{ img }}', this, {{ loop.index }}, 'image')">
+                                    <div class="thumbnail" data-index="{{ loop.index }}" data-type="image" data-src="{{ img }}">
                                         <img src="{{ img }}" alt="Additional {{ loop.index }}">
                                     </div>
                                     {% endif %}
                                 {% endfor %}
                             {% endif %}
 
-                            <!-- YouTube видео (ПОСЛЕДНИЙ СЛАЙД) -->
+                            <!-- YouTube видео - последний слайд, НЕ активный -->
                             {% if property.youtube_url %}
-                            <div class="thumbnail video-thumbnail {% if property.youtube_url %}active{% endif %}" onclick="changeToVideo('{{ property.youtube_url }}', this, {{ (property.additional_images|length if property.additional_images else 0) + 1 }})">
-                                <img src="https://img.youtube.com/vi/{{ property.youtube_url.split('v=')[-1].split('&')[0] if 'v=' in property.youtube_url else property.youtube_url.split('/')[-1] }}/mqdefault.jpg" alt="YouTube Video">
+                            <div class="thumbnail video-thumbnail" data-index="{{ (property.additional_images|length if property.additional_images else 0) + 1 }}" data-type="video" data-url="{{ property.youtube_url }}">
+                                {% set video_id = property.youtube_url.split('v=')[-1].split('&')[0] if 'v=' in property.youtube_url else property.youtube_url.split('/')[-1] %}
+                                <img src="https://img.youtube.com/vi/{{ video_id }}/mqdefault.jpg" alt="YouTube Video">
                             </div>
                             {% endif %}
                         </div>
@@ -804,7 +789,6 @@
                         {% endif %}
                     </div>
 
-                    <!-- Details -->
                     <div class="property-details">
                         <div class="detail-header">
                             <div>
@@ -869,7 +853,6 @@
                             {% endif %}
                         </div>
 
-                        <!-- Seller Contacts -->
                         <div class="seller-contacts">
                             <h3>Связаться с продавцом</h3>
                             <div class="contact-buttons">
@@ -891,41 +874,84 @@
                                 +90 554 332 33 96
                             </a>
                         </div>
-
-
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Similar Properties -->
+        <!-- ===== ПОХОЖИЕ ОБЪЕКТЫ ===== -->
         <section class="similar-section">
             <div class="container">
                 <h2 class="section-title" style="text-align: center; margin-bottom: 40px;">Похожие объекты</h2>
-                <div class="properties-grid" id="similar-properties"></div>
+                <div class="properties-grid" id="similar-properties">
+                    {% if similar_properties %}
+                        {% for similar in similar_properties %}
+                        <div class="property-card">
+                            <div class="property-image-wrapper">
+                                <img src="{{ similar.image }}" alt="{{ similar.name }}" class="property-image" onerror="this.src='/static/images/placeholder.jpg'">
+                                <div class="price-badge">€{{ "{:,.0f}".format(similar.price) }}</div>
+                                <div class="property-overlay">
+                                    <a href="/property/{{ similar.id }}" class="view-details">Подробнее</a>
+                                </div>
+                            </div>
+                            <div class="property-info">
+                                <h3 class="property-name">{{ similar.name }}</h3>
+                                <p class="property-location">
+                                    <i class="fas fa-map-marker-alt" style="color: var(--accent-color);"></i>
+                                    {{ similar.location }}
+                                </p>
+                                <div class="property-specs">
+                                    <span class="spec-item">
+                                        <i class="fas fa-ruler-combined"></i>
+                                        {{ similar.area }} м²
+                                    </span>
+                                    <span class="spec-item">
+                                        <i class="fas fa-bed"></i>
+                                        {{ similar.bedrooms }}
+                                    </span>
+                                    <span class="spec-item">
+                                        <i class="fas fa-bath"></i>
+                                        {{ similar.bathrooms }}
+                                    </span>
+                                </div>
+                                <div class="property-footer">
+                                    <span class="property-price">€{{ "{:,.0f}".format(similar.price) }}</span>
+                                    <span class="property-type">{{ similar.property_type }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div style="grid-column: 1/-1; text-align: center; opacity: 0.6; padding: 40px;">
+                            <i class="fas fa-home" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i>
+                            <h3>Похожих объектов не найдено</h3>
+                            <p>Свяжитесь с нами для подбора вариантов</p>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
         </section>
+
     </main>
 
-    <!-- ===== FOOTER ===== -->
     <footer>
         <div class="container footer-content">
             <div class="footer-grid">
                 <div class="footer-section">
-                    <h3>Rspect Home</h3>
+                    <h3>Respect Home</h3>
                     <p>Ведущее агентство по недвижимости в Турции</p>
                 </div>
                 <div class="footer-section">
-                <h3>Навигация</h3>
-                    <a href="/properties">Объекты</a>
+                    <h3>Навигация</h3>
+                    <a href="/novostroy">Объекты</a>
                     <a href="/about">О нас</a>
                     <a href="/contacts">Контакты</a>
                 </div>
                 <div class="footer-section">
                     <h3>Социальные сети</h3>
-                    <a href="https://www.tiktok.com/@anastasiia_respect_home?_r=1&_t=ZS-94pAnu3mWdc">TikTok</a>
-                    <a href="https://www.instagram.com/respect_home_alanya?igsh=MTg2NmYzODJqOGcycw%3D%3D&utm_source=qr">Instagram</a>
-                    <a href="https://api.whatsapp.com/send/?phone=905543323396&text&type=phone_number&app_absent=0">WhatsApp</a>
+                    <a href="https://www.tiktok.com/@anastasiia_respect_home">TikTok</a>
+                    <a href="https://www.instagram.com/respect_home_alanya">Instagram</a>
+                    <a href="https://api.whatsapp.com/send/?phone=905543323396">WhatsApp</a>
                 </div>
             </div>
             <div class="footer-bottom">
@@ -934,7 +960,6 @@
         </div>
     </footer>
 
-    <!-- ===== JAVASCRIPT ===== -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -962,24 +987,21 @@
                 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMobileMenu(); });
             }
 
-            // ===== ГАЛЕРЕЯ + YOUTUBE =====
+            // ===== ГАЛЕРЕЯ =====
             const thumbnails = document.querySelectorAll('.thumbnail');
-            const allThumbnails = Array.from(thumbnails);
-            let currentImageIndex = 0;
-            let isVideoMode = {% if property.youtube_url %}true{% else %}false{% endif %};
-            const totalImages = allThumbnails.length;
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const mainContainer = document.getElementById('mainImageContainer');
+            const currentImageNumSpan = document.getElementById('currentImageNum');
+            const totalImagesSpan = document.getElementById('totalImages');
             
-            document.getElementById('totalImages').textContent = totalImages;
-            if (totalImages > 1) {
-                document.getElementById('prevBtn').style.display = 'flex';
-                document.getElementById('nextBtn').style.display = 'flex';
-            }
-
-            // Извлекает ID видео из разных форматов YouTube ссылок
+            let currentIndex = 0;
+            const totalItems = thumbnails.length;
+            
+            // Функция для получения ID видео из YouTube ссылки
             function getYouTubeVideoId(url) {
                 if (!url) return null;
                 let videoId = null;
-                
                 if (url.includes('youtube.com/watch')) {
                     const urlParams = new URLSearchParams(new URL(url).search);
                     videoId = urlParams.get('v');
@@ -988,97 +1010,72 @@
                 } else if (url.includes('youtube.com/embed/')) {
                     videoId = url.split('embed/')[1].split('?')[0];
                 }
-                
                 return videoId;
             }
-
-            // Переключает на изображение
-            window.changeImage = function(src, element, index, type = 'image') {
-                const container = document.getElementById('mainImageContainer');
+            
+            // Функция переключения слайда
+            function switchToSlide(index) {
+                if (index < 0) index = totalItems - 1;
+                if (index >= totalItems) index = 0;
                 
-                if (container.querySelector('iframe')) {
-                    container.innerHTML = `<img id="main-image" src="${src}" alt="Property" style="width:100%;height:100%;object-fit:cover;">
-                        <div class="image-counter"><span id="currentImageNum">${index + 1}</span> / <span id="totalImages">${totalImages}</span></div>`;
-                } else {
-                    const mainImage = document.getElementById('main-image');
-                    if (mainImage) {
-                        mainImage.style.opacity = '0.5';
-                        setTimeout(() => { 
-                            mainImage.src = src; 
-                            mainImage.style.opacity = '1'; 
-                        }, 150);
+                currentIndex = index;
+                const thumb = thumbnails[currentIndex];
+                const type = thumb.dataset.type;
+                
+                // Обновляем активный класс у миниатюр
+                thumbnails.forEach(t => t.classList.remove('active'));
+                thumb.classList.add('active');
+                
+                // Обновляем основной контент
+                if (type === 'video') {
+                    const videoUrl = thumb.dataset.url;
+                    const videoId = getYouTubeVideoId(videoUrl);
+                    if (videoId) {
+                        mainContainer.innerHTML = `
+                            <iframe id="youtube-frame" 
+                                    src="https://www.youtube.com/embed/${videoId}?autoplay=0&rel=0&modestbranding=1" 
+                                    frameborder="0" 
+                                    allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                    allowfullscreen
+                                    style="width:100%;height:100%;border:0;">
+                            </iframe>
+                            <div class="image-counter">
+                                <span id="currentImageNum">${currentIndex + 1}</span> / <span id="totalImages">${totalItems}</span>
+                            </div>
+                        `;
                     }
-                }
-                
-                allThumbnails.forEach(t => t.classList.remove('active'));
-                if (element) {
-                    element.classList.add('active');
-                    element.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-                }
-                currentImageIndex = index;
-                document.getElementById('currentImageNum').textContent = index + 1;
-                isVideoMode = false;
-            };
-
-            // Переключает на YouTube видео
-            window.changeToVideo = function(url, element, index) {
-                const videoId = getYouTubeVideoId(url);
-                if (!videoId) { 
-                    alert('Неверная ссылка на YouTube'); 
-                    return; 
-                }
-                
-                const container = document.getElementById('mainImageContainer');
-                container.innerHTML = `
-                    <iframe id="youtube-frame" 
-                            src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                            allowfullscreen
-                            style="width:100%;height:100%;border:0;">
-                    </iframe>
-                    <div class="image-counter"><span id="currentImageNum">${index + 1}</span> / <span id="totalImages">${totalImages}</span></div>
-                `;
-                
-                allThumbnails.forEach(t => t.classList.remove('active'));
-                if (element) element.classList.add('active');
-                
-                currentImageIndex = index;
-                document.getElementById('currentImageNum').textContent = index + 1;
-                isVideoMode = true;
-            };
-
-            // Навигация по галерее
-            window.navigateGallery = function(direction) {
-                currentImageIndex += direction;
-                if (currentImageIndex < 0) currentImageIndex = totalImages - 1;
-                if (currentImageIndex >= totalImages) currentImageIndex = 0;
-                
-                const thumb = allThumbnails[currentImageIndex];
-                if (!thumb) return;
-                
-                if (thumb.classList.contains('video-thumbnail')) {
-                    const videoUrl = '{{ property.youtube_url if property and property.youtube_url else "" }}';
-                    changeToVideo(videoUrl, thumb, currentImageIndex);
                 } else {
-                    const imgSrc = thumb.querySelector('img')?.src;
-                    if (imgSrc) changeImage(imgSrc, thumb, currentImageIndex, 'image');
+                    const imgSrc = thumb.dataset.src;
+                    mainContainer.innerHTML = `
+                        <img id="main-image" src="${imgSrc}" alt="Property" style="width:100%;height:100%;object-fit:cover;">
+                        <div class="image-counter">
+                            <span id="currentImageNum">${currentIndex + 1}</span> / <span id="totalImages">${totalItems}</span>
+                        </div>
+                    `;
                 }
-            };
-
-            // Клавиши навигации
-            document.addEventListener('keydown', function(e) {
-                if (totalImages <= 1) return;
-                if (e.key === 'ArrowLeft') navigateGallery(-1);
-                if (e.key === 'ArrowRight') navigateGallery(1);
+                
+                // Обновляем счетчик
+                document.getElementById('currentImageNum').textContent = currentIndex + 1;
+            }
+            
+            // Обработчики навигации
+            if (prevBtn && nextBtn) {
+                prevBtn.addEventListener('click', () => switchToSlide(currentIndex - 1));
+                nextBtn.addEventListener('click', () => switchToSlide(currentIndex + 1));
+            }
+            
+            // Обработчики кликов на миниатюры
+            thumbnails.forEach((thumb, idx) => {
+                thumb.addEventListener('click', () => switchToSlide(idx));
             });
-
-            // Контактная форма
-            window.showContactForm = function() { 
-                alert('Спасибо за интерес! Мы скоро свяжемся с вами.'); 
-            };
-
-            // ===== УЛУЧШЕННАЯ КАРТА =====
+            
+            // Клавиши навигации
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowLeft') switchToSlide(currentIndex - 1);
+                if (e.key === 'ArrowRight') switchToSlide(currentIndex + 1);
+            });
+            
+            // ===== КАРТА =====
             {% if property.latitude and property.longitude %}
             setTimeout(function() {
                 const mapContainer = document.getElementById('map');
@@ -1091,7 +1088,6 @@
                         subdomains: 'abcd'
                     }).addTo(map);
                     
-                    // Кастомная иконка маркера
                     const customIcon = L.divIcon({
                         className: 'custom-marker',
                         html: '<div style="background: var(--accent-color); width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 20px rgba(212,165,116,0.8);"></div>',
@@ -1109,13 +1105,12 @@
                         <br>
                         <span style="color: white;">{{ property.location }}</span>
                         <br>
-                        <span style="color: var(--accent-color); font-weight: bold;">${{ "{:,.0f}".format(property.price) }}</span>
+                        <span style="color: var(--accent-color); font-weight: bold;">€{{ "{:,.0f}".format(property.price) }}</span>
                     `, {
                         className: 'custom-popup',
                         closeButton: false
                     }).openPopup();
                     
-                    // Добавляем красивый круг радиуса
                     L.circle([{{ property.latitude }}, {{ property.longitude }}], {
                         color: 'var(--accent-color)',
                         fillColor: 'var(--accent-color)',
@@ -1125,49 +1120,8 @@
                 }
             }, 500);
             {% endif %}
-
-            // ===== ПОХОЖИЕ ОБЪЕКТЫ =====
-            fetch('/api/properties')
-                .then(r => r.json())
-                .then(data => {
-                    const container = document.getElementById('similar-properties');
-                    if (!container) return;
-                    
-                    const similar = data
-                        .filter(p => p.id !== {{ property.id }} && p.category === '{{ property.category }}')
-                        .slice(0, 3);
-                    
-                    if (similar.length === 0) {
-                        container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; opacity: 0.6; padding: 40px;">Похожих объектов не найдено</p>';
-                        return;
-                    }
-                    
-                    container.innerHTML = similar.map(p => `
-                        <div class="property-card">
-                            <div class="property-image-wrapper">
-                                <img src="${p.image}" alt="${p.name}" class="property-image">
-                                <div class="price-badge">€${p.price.toLocaleString()}</div>
-                                <div class="property-overlay">
-                                    <a href="/property/${p.id}" class="view-details">Подробнее</a>
-                                </div>
-                            </div>
-                            <div class="property-info">
-                                <h3 class="property-name">${p.name}</h3>
-                                <p class="property-location">${p.location}</p>
-                                <div class="property-specs">
-                                    <span class="spec-item">${p.area} м²</span>
-                                    <span class="spec-item">${p.bedrooms} спал.</span>
-                                    <span class="spec-item">${p.bathrooms} ванн.</span>
-                                </div>
-                                <div class="property-footer">
-                                    <span class="property-price">$${p.price.toLocaleString()}</span>
-                                    <span class="property-type">${p.property_type}</span>
-                                </div>
-                            </div>
-                        </div>
-                    `).join('');
-                })
-                .catch(error => console.error('Error loading similar properties:', error));
+            
+   
         });
     </script>
 </body>

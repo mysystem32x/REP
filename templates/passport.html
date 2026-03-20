@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Гражданство за недвижимость | Respect Home</title>
+    <!-- Подключение внешнего CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Шрифты -->
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" href="/static/images/favicon.svg" type="image/svg+xml">
+    <style>
+        /* ===== ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ СТРАНИЦЫ ГРАЖДАНСТВА ===== */
+        .category-header {
+            padding: 150px 0 50px;
+            background: linear-gradient(to bottom, rgba(17,12,9,0.95) 0%, var(--bg-color) 100%);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .category-title {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-color);
+            font-family: var(--font-title);
+            letter-spacing: 2px;
+            text-align: center;
+        }
+
+        .category-description {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+
+        /* Стили для кнопок-переключателей */
+        .category-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 50px;
+            flex-wrap: wrap;
+        }
+
+        .category-tab-btn {
+            padding: 14px 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 50px;
+            color: var(--text-color);
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: var(--font-main);
+            letter-spacing: 1px;
+        }
+
+        .category-tab-btn:hover {
+            background: rgba(212, 165, 116, 0.15);
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        .category-tab-btn.active {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border-color: var(--accent-color);
+            box-shadow: 0 5px 20px rgba(212, 165, 116, 0.4);
+        }
+
+        /* Секция с информацией - ВЫРОВНЕННЫЕ БЛОКИ */
+        .info-section {
+            background: linear-gradient(135deg, rgba(212, 165, 116, 0.1) 0%, rgba(212, 165, 116, 0.05) 100%);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 60px;
+            border: 1px solid rgba(212, 165, 116, 0.3);
+        }
+
+        .info-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 35px;
+            font-family: var(--font-title);
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .info-content {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            align-items: stretch;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .info-card:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-5px);
+            background: rgba(212, 165, 116, 0.05);
+        }
+
+        .info-card h3 {
+            font-size: 20px;
+            color: var(--accent-color);
+            margin-bottom: 18px;
+            font-family: var(--font-title);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-card h3 i {
+            font-size: 24px;
+            width: 30px;
+            text-align: center;
+        }
+
+        .info-card p {
+            font-size: 15px;
+            line-height: 1.7;
+            opacity: 0.85;
+            margin-bottom: 12px;
+        }
+
+        .info-card ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            flex: 1;
+        }
+
+        .info-card li {
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 12px;
+            font-size: 14px;
+            opacity: 0.8;
+            line-height: 1.5;
+            text-align: left;
+        }
+
+        .info-card li:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-card li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+            font-weight: bold;
+            width: 20px;
+            text-align: left;
+        }
+
+        /* Бейдж гражданства с PNG иконкой */
+        .citizenship-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: linear-gradient(135deg, #d4a574 0%, #b88b5a 100%);
+            color: var(--bg-color);
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            z-index: 2;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(2px);
+        }
+
+        .citizenship-badge img {
+            width: 20px;
+            vertical-align: middle;
+        }
+
+        /* Секция с объектами */
+        .properties-section-category {
+            padding: 0 0 80px;
+        }
+
+        .properties-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            padding: 30px 0;
+        }
+
+        /* ===== УЛУЧШЕННАЯ АДАПТАЦИЯ ДЛЯ МОБИЛЬНЫХ ===== */
+
+        /* Планшеты (768px - 1024px) */
+        @media screen and (min-width: 768px) and (max-width: 1024px) {
+            .properties-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+            
+            .info-content {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+        }
+
+        /* Мобильные устройства (до 767px) */
+        @media screen and (max-width: 767px) {
+            .category-header {
+                padding: 120px 0 30px;
+            }
+            
+            .category-title {
+                font-size: 32px;
+            }
+            
+            .category-description {
+                font-size: 14px;
+                padding: 0 20px;
+                margin-bottom: 30px;
+            }
+            
+            .category-tabs {
+                gap: 10px;
+                margin-bottom: 30px;
+                padding: 0 10px;
+            }
+            
+            .category-tab-btn {
+                padding: 8px 18px;
+                font-size: 13px;
+            }
+            
+            /* Адаптация информационных блоков */
+            .info-section {
+                padding: 25px 20px;
+                margin: 0 15px 40px 15px;
+                border-radius: 16px;
+            }
+            
+            .info-title {
+                font-size: 22px;
+                margin-bottom: 25px;
+                flex-wrap: wrap;
+            }
+            
+            .info-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .info-card {
+                padding: 20px;
+            }
+            
+            .info-card h3 {
+                font-size: 18px;
+                margin-bottom: 15px;
+            }
+            
+            .info-card h3 i {
+                font-size: 20px;
+                width: 26px;
+            }
+            
+            .info-card p {
+                font-size: 14px;
+                line-height: 1.6;
+            }
+            
+            .info-card li {
+                font-size: 13px;
+                margin-bottom: 10px;
+                padding-left: 22px;
+            }
+            
+            /* Адаптация сетки объектов */
+            .properties-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+                padding: 15px;
+            }
+        }
+
+        /* Очень маленькие экраны (до 480px) */
+        @media screen and (max-width: 480px) {
+            .category-title {
+                font-size: 28px;
+            }
+            
+            .category-description {
+                font-size: 13px;
+                padding: 0 15px;
+            }
+            
+            .category-tab-btn {
+                padding: 6px 14px;
+                font-size: 12px;
+            }
+            
+            .info-section {
+                padding: 20px 15px;
+                margin: 0 10px 30px 10px;
+            }
+            
+            .info-title {
+                font-size: 20px;
+            }
+            
+            .info-card {
+                padding: 16px;
+            }
+            
+            .info-card h3 {
+                font-size: 16px;
+            }
+            
+            .info-card h3 i {
+                font-size: 18px;
+                width: 24px;
+            }
+            
+            .info-card p {
+                font-size: 13px;
+            }
+            
+            .info-card li {
+                font-size: 12px;
+                margin-bottom: 8px;
+                padding-left: 20px;
+            }
+            
+            .properties-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 12px;
+                padding: 10px;
+            }
+            
+            .citizenship-badge {
+                padding: 4px 10px;
+                font-size: 10px;
+                top: 8px;
+                right: 8px;
+            }
+            
+            .citizenship-badge img {
+                width: 12px;
+                height: 12px;
+            }
+        }
+
+        /* Экстремально маленькие экраны (до 360px) */
+        @media screen and (max-width: 360px) {
+            .properties-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .category-tab-btn {
+                padding: 5px 12px;
+                font-size: 11px;
+            }
+        }
+
+        /* Альбомная ориентация на мобильных */
+        @media screen and (max-height: 600px) and (orientation: landscape) and (max-width: 767px) {
+            .info-content {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .properties-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 12px;
+            }
+        }
+
+        /* Статистика */
+        .stats-badge-category {
+            background: rgba(212, 165, 116, 0.2);
+            border: 1px solid var(--accent-color);
+            border-radius: 30px;
+            padding: 8px 20px;
+            font-size: 14px;
+            color: var(--accent-color);
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .no-results-category {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            opacity: 0.8;
+        }
+
+        .no-results-category i {
+            font-size: 48px;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .no-results-category h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+        }
+
+        .no-results-category p {
+            font-size: 14px;
+            opacity: 0.6;
+        }
+
+        /* Анимация */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .property-card, .info-card {
+            animation: fadeIn 0.5s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== HEADER ===== -->
+    <header class="main-header">
+        <div class="container header-content">
+            <div class="logo-section">
+                <a href="/" style="text-decoration: none; display: flex; align-items: center;">
+                    <img src="/static/images/logo.png" alt="Respect Home" class="main-logo">
+                </a>
+            </div>
+
+            <nav class="desktop-nav">
+                <ul class="nav-menu">
+                    <li><a href="/">Главная</a></li>
+                    <li><a href="/novostroy" class="active">Объекты</a></li>
+                    <li><a href="/about">О нас</a></li>
+                    <li><a href="/contacts">Контакты</a></li>
+                    <li><a href="/admin">Панель управления</a></li>
+                </ul>
+            </nav>
+
+            <div class="header-actions">
+                <div class="contact-info">
+                    <a href="tel:+905554332396" class="phone">+90 554 332 33 96</a>
+                </div>
+                
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Меню">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Мобильное меню -->
+    <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+    <nav class="mobile-nav" id="mobileNav">
+        <div class="mobile-nav-links">
+            <a href="/" class="nav-link">Главная</a>
+            <a href="/novostroy" class="nav-link nav-active">Объекты</a>
+            <a href="/about" class="nav-link">О нас</a>
+            <a href="/contacts" class="nav-link">Контакты</a>
+            <a href="/admin" class="nav-link">Панель управления</a>
+        </div>
+        <div class="mobile-contact-info">
+            <p>📞 Связаться</p>
+            <a href="tel:+905543323396">+90 554 332 33 96</a>
+            <p style="margin-top: 15px;">✉️ Почта</p>
+            <a href="mailto:anastasiiainvestor@gmail.com">anastasiiainvestor@gmail.com</a>
+        </div>
+    </nav>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main>
+        <section class="category-header">
+            <div class="container">
+                <h1 class="category-title">Гражданство Турции за инвестиции</h1>
+                <p class="category-description">
+                    Инвестируйте в недвижимость от $400 000 и получите турецкое гражданство<br>
+                    Выберите тип недвижимости для просмотра
+                </p>
+                
+                <!-- Кнопки-переключатели -->
+                <div class="category-tabs">
+                    <button class="category-tab-btn" data-type="all">Все объекты</button>
+                    <button class="category-tab-btn" data-type="Вилла">Виллы</button>
+                    <button class="category-tab-btn" data-type="Квартира">Квартиры</button>
+                    <button class="category-tab-btn" data-type="info">Информация</button>
+                </div>
+                
+                <div style="text-align: center;">
+                    <span class="stats-badge-category" id="property-stats">0 объектов</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Секция с информацией о гражданстве -->
+        <div class="container" id="infoSection" style="display: none;">
+            <div class="info-section">
+                <h2 class="info-title">
+                    🇹🇷 Получение гражданства Турции
+                </h2>
+                <div class="info-content">
+                    <div class="info-card">
+                        <h3>📋 Условия получения</h3>
+                        <ul>
+                            <li>⠀Приобрести недвижимость от <strong>$400 000 USD</strong></li>
+                            <li>⠀Владеть объектом минимум <strong>3 года</strong></li>
+                            <li>⠀Оформить сделку через банк в Турции</li>
+                            <li>⠀Получить сертификат соответствия от министерства</li>
+                            <li>⠀Оценка недвижимости независимым экспертом</li>
+                        </ul>
+                    </div>
+                    <div class="info-card">
+                        <h3>⚡ Преимущества гражданства</h3>
+                        <ul>
+                            <li>⠀Безвизовый въезд в <strong>110+ стран</strong></li>
+                            <li>⠀Право на проживание и работу в Турции</li>
+                            <li>⠀Получение турецкого паспорта</li>
+                            <li>⠀Возможность для всей семьи (супруг(а) и дети до 18 лет)</li>
+                            <li>⠀Сохранение гражданства РФ</li>
+                            <li>⠀Доступ к бесплатной медицине и образованию</li>
+                        </ul>
+                    </div>
+                    <div class="info-card">
+                        <h3>📝 Необходимые документы</h3>
+                        <ul>
+                            <li>⠀Загранпаспорт (нотариально заверенный перевод)</li>
+                            <li>⠀Свидетельство о рождении</li>
+                            <li>⠀Свидетельство о браке (при наличии)</li>
+                            <li>⠀Документы на недвижимость (TAPU)</li>
+                            <li>⠀Сертификат о соответствии инвестиций</li>
+                            <li>⠀Справка об отсутствии судимости</li>
+                        </ul>
+                    </div>
+                    <div class="info-card">
+                        <h3>⏱️ Сроки и этапы</h3>
+                        <ul>
+                            <li>⠀<strong>1-2 недели</strong> — Покупка недвижимости</li>
+                            <li>⠀<strong>3-4 недели</strong> — Получение сертификата</li>
+                            <li>⠀<strong>3-6 месяцев</strong> — Подача документов</li>
+                            <li>⠀<strong>3-4 месяца</strong> — Получение паспорта</li>
+                            <li>⠀<strong>⭐ Общий срок: 6-12 месяцев</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Секция с объектами -->
+        <section class="properties-section-category">
+            <div class="container">
+                <div class="properties-grid" id="properties-grid">
+                    {% if properties %}
+                        {% for property in properties %}
+                        <div class="property-card"
+                             data-id="{{ property.id }}"
+                             data-type="{{ property.property_type }}"
+                             data-price="{{ property.price }}"
+                             data-name="{{ property.name | lower }}"
+                             data-location="{{ property.location | lower }}"
+                             data-area="{{ property.area }}"
+                             data-bedrooms="{{ property.bedrooms }}"
+                             data-bathrooms="{{ property.bathrooms }}"
+                             data-features="{{ property.features|lower if property.features else '' }}">
+                            <div class="property-image-wrapper">
+                                <img src="{{ property.image }}" alt="{{ property.name }}" class="property-image" onerror="this.src='/static/images/placeholder.jpg'">
+                                <div class="property-price-tag">€{{ "{:,.0f}".format(property.price) }}</div>
+                                <div class="citizenship-badge">
+                                    <img src="/static/images/icons8-passport-96.png" alt="Passport">
+                                    Гражданство
+                                </div>
+                                <div class="property-overlay">
+                                    <a href="/property/{{ property.id }}" class="view-details">Подробнее</a>
+                                </div>
+                            </div>
+                            <div class="property-info">
+                                <h3 class="property-name">{{ property.name }}</h3>
+                                <p class="property-location">
+                                    <i class="fas fa-map-marker-alt" style="color: var(--accent-color);"></i>
+                                    {{ property.location }}
+                                </p>
+                                <div class="property-specs">
+                                    <span class="spec-item">
+                                        <i class="fas fa-ruler-combined"></i>
+                                        {{ property.area }} м²
+                                    </span>
+                                    <span class="spec-item">
+                                        <i class="fas fa-bed"></i>
+                                        {{ property.bedrooms }}
+                                    </span>
+                                    <span class="spec-item">
+                                        <i class="fas fa-bath"></i>
+                                        {{ property.bathrooms }}
+                                    </span>
+                                </div>
+                                <div class="property-footer">
+                                    <span class="property-price">€{{ "{:,.0f}".format(property.price) }}</span>
+                                    <span class="property-type">{{ property.property_type }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="no-results-category">
+                            <img src="/static/images/icons8-passport-96.png" alt="Passport" style="width: 60px; opacity: 0.5; margin-bottom: 20px;">
+                            <h3>Объектов для гражданства пока нет</h3>
+                            <p>Свяжитесь с нами для подбора вариантов</p>
+                            <p style="margin-top: 20px; font-size: 13px;">Мы поможем подобрать идеальный объект для получения гражданства</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3>Respect Home</h3>
+                    <p>Ведущее агентство по недвижимости в Турции</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Навигация</h3>
+                    <a href="/novostroy">Объекты</a>
+                    <a href="/about">О нас</a>
+                    <a href="/contacts">Контакты</a>
+                </div>
+                <div class="footer-section">
+                    <h3>Социальные сети</h3>
+                    <a href="https://www.tiktok.com/@anastasiia_respect_home">TikTok</a>
+                    <a href="https://www.instagram.com/respect_home_alanya">Instagram</a>
+                    <a href="https://api.whatsapp.com/send/?phone=905543323396">WhatsApp</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="copyright">Copyright © 2025 Respect Home</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // ===== МОБИЛЬНОЕ МЕНЮ =====
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const mobileNav = document.getElementById('mobileNav');
+            const mobileNavOverlay = document.getElementById('mobileNavOverlay');
+            
+            if (mobileMenuToggle && mobileNav && mobileNavOverlay) {
+                function toggleMobileMenu() {
+                    mobileMenuToggle.classList.toggle('active');
+                    mobileNav.classList.toggle('active');
+                    mobileNavOverlay.classList.toggle('active');
+                    document.body.classList.toggle('menu-open');
+                }
+                function closeMobileMenu() {
+                    mobileMenuToggle.classList.remove('active');
+                    mobileNav.classList.remove('active');
+                    mobileNavOverlay.classList.remove('active');
+                    document.body.classList.remove('menu-open');
+                }
+                mobileMenuToggle.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); toggleMobileMenu(); });
+                mobileNavOverlay.addEventListener('click', closeMobileMenu);
+                if (mobileNav) {
+                    mobileNav.querySelectorAll('.nav-link').forEach(link => link.addEventListener('click', closeMobileMenu));
+                }
+                window.addEventListener('resize', () => { if (window.innerWidth > 1024) closeMobileMenu(); });
+                document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMobileMenu(); });
+            }
+
+            // ===== ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК =====
+            const propertyCards = document.querySelectorAll('.property-card');
+            const propertyStats = document.getElementById('property-stats');
+            const tabButtons = document.querySelectorAll('.category-tab-btn');
+            const infoSection = document.getElementById('infoSection');
+            const propertiesGrid = document.getElementById('properties-grid');
+            
+            let currentType = 'info';
+            
+            function getDeclension(number, one, two, five) {
+                let n = Math.abs(number);
+                n %= 100;
+                if (n >= 5 && n <= 20) return five;
+                n %= 10;
+                if (n === 1) return one;
+                if (n >= 2 && n <= 4) return two;
+                return five;
+            }
+            
+            function filterAndDisplay() {
+                if (currentType === 'info') {
+                    if (infoSection) infoSection.style.display = 'block';
+                    if (propertiesGrid) propertiesGrid.style.display = 'none';
+                    if (propertyStats) propertyStats.style.display = 'none';
+                    return;
+                }
+                
+                if (infoSection) infoSection.style.display = 'none';
+                if (propertiesGrid) propertiesGrid.style.display = 'grid';
+                if (propertyStats) propertyStats.style.display = 'inline-block';
+                
+                let visibleCount = 0;
+                
+                propertyCards.forEach(card => {
+                    let show = true;
+                    
+                    if (currentType !== 'all') {
+                        const propertyType = card.dataset.type;
+                        if (propertyType !== currentType) {
+                            show = false;
+                        }
+                    }
+                    
+                    card.style.display = show ? '' : 'none';
+                    if (show) visibleCount++;
+                });
+                
+                if (propertyStats) {
+                    propertyStats.textContent = `${visibleCount} ${getDeclension(visibleCount, 'объект', 'объекта', 'объектов')}`;
+                }
+            }
+            
+            function switchTab(type) {
+                currentType = type;
+                
+                tabButtons.forEach(btn => {
+                    if (btn.dataset.type === type) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+                
+                filterAndDisplay();
+            }
+            
+            tabButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    switchTab(btn.dataset.type);
+                });
+            });
+            
+            // Устанавливаем активную кнопку "Информация" и показываем информацию
+            tabButtons.forEach(btn => {
+                if (btn.dataset.type === 'info') {
+                    btn.classList.add('active');
+                }
+            });
+            
+            filterAndDisplay();
+        });
+    </script>
+</body>
+</html>

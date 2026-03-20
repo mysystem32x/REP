@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Интерьеры под ключ | Respect Home</title>
+    <!-- Подключение внешнего CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Шрифты -->
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" href="/static/images/favicon.svg" type="image/svg+xml">
+    <style>
+        /* ===== ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ СТРАНИЦЫ ИНТЕРЬЕРОВ ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* Hero Section */
+        .interior-hero {
+            position: relative;
+            height: 100vh;
+            min-height: 700px;
+            background-image: url('/static/images/interier_background.jpg');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        
+        .interior-hero .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.5) 100%);
+        }
+        
+        .interior-hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            padding: 0 20px;
+        }
+        
+        .interior-hero-title {
+            font-size: 56px;
+            font-weight: 700;
+            font-family: var(--font-title);
+            color: var(--text-color);
+            margin-bottom: 20px;
+            line-height: 1.2;
+            animation: fadeInUp 0.8s ease;
+        }
+        
+        .interior-hero-subtitle {
+            font-size: 20px;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 30px;
+            line-height: 1.5;
+            animation: fadeInUp 0.8s ease 0.2s forwards;
+            opacity: 0;
+            animation-fill-mode: forwards;
+        }
+        
+        .interior-hero-btn {
+            display: inline-block;
+            padding: 14px 35px;
+            background: var(--accent-color);
+            color: var(--bg-color);
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.8s ease 0.4s forwards;
+            opacity: 0;
+            animation-fill-mode: forwards;
+            cursor: pointer;
+        }
+        
+        .interior-hero-btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(212,165,116,0.4);
+        }
+        
+        /* Before After Slider */
+        .before-after-section {
+            padding: 80px 0;
+            background: var(--bg-secondary);
+        }
+        
+        .section-title {
+            font-size: 36px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 15px;
+            color: var(--accent-color);
+            font-family: var(--font-title);
+        }
+        
+        .section-subtitle {
+            text-align: center;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 50px;
+            font-size: 16px;
+            padding: 0 15px;
+        }
+        
+        .slider-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        
+        .before-after-slider {
+            position: relative;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 10;
+            overflow: hidden;
+            background: #1a1410;
+        }
+        
+        .before-after-slider img {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .after-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .before-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            clip-path: inset(0 50% 0 0);
+            transition: clip-path 0.05s linear;
+        }
+        
+        .slider-handle {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 4px;
+            height: 100%;
+            background: var(--accent-color);
+            cursor: ew-resize;
+            z-index: 10;
+            transform: translateX(-50%);
+        }
+        
+        .slider-handle::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            border: 3px solid var(--text-color);
+            cursor: ew-resize;
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+        }
+        
+        .slider-handle::after {
+            content: '◀ ▶';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            white-space: nowrap;
+        }
+        
+        .slider-caption {
+            text-align: center;
+            margin-top: 20px;
+            padding: 12px 20px;
+            background: rgba(212,165,116,0.1);
+            border-radius: 12px;
+        }
+        
+        .slider-caption p {
+            margin: 0;
+            color: var(--accent-color);
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        /* Услуги */
+        .services-section {
+            padding: 80px 0;
+        }
+        
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .service-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-color);
+            background: rgba(212,165,116,0.05);
+        }
+        
+        .service-icon {
+            font-size: 48px;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+        }
+        
+        .service-card h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: var(--accent-color);
+        }
+        
+        .service-card p {
+            font-size: 14px;
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+        
+        /* Прайс-лист */
+        .pricing-section {
+            padding: 80px 0;
+            background: rgba(212,165,116,0.05);
+        }
+        
+        .pricing-type {
+            margin-bottom: 60px;
+        }
+        
+        .pricing-type-title {
+            font-size: 32px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 40px;
+            color: var(--accent-color);
+            font-family: var(--font-title);
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .pricing-type-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 2px;
+            background: var(--accent-color);
+        }
+        
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .pricing-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 35px 25px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent-color);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        
+        .pricing-card.luxury {
+            border-color: var(--accent-color);
+            background: linear-gradient(135deg, rgba(212,165,116,0.08) 0%, rgba(212,165,116,0.02) 100%);
+        }
+        
+        .pricing-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent-color);
+            color: var(--bg-color);
+            padding: 5px 20px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        
+        .pricing-card h3 {
+            font-size: 26px;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+            text-align: center;
+        }
+        
+        .pricing-price {
+            font-size: 42px;
+            font-weight: 700;
+            color: var(--text-color);
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        
+        .pricing-price span {
+            font-size: 16px;
+            opacity: 0.7;
+        }
+        
+        .pricing-desc {
+            text-align: center;
+            font-size: 13px;
+            opacity: 0.7;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .pricing-features {
+            list-style: none;
+            margin: 20px 0;
+            padding: 0;
+        }
+        
+        .pricing-features li {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .pricing-features li i {
+            color: var(--accent-color);
+            width: 22px;
+            font-size: 14px;
+        }
+        
+        .feature-highlight {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+        
+        .pricing-time {
+            background: rgba(212,165,116,0.15);
+            padding: 10px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 13px;
+        }
+        
+        .pricing-time i {
+            margin-right: 8px;
+            color: var(--accent-color);
+        }
+        
+        .pricing-advantage {
+            background: rgba(255,255,255,0.05);
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 13px;
+            border-left: 3px solid var(--accent-color);
+        }
+        
+        .pricing-btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .pricing-btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+        
+        /* Преимущества пакетной цены */
+        .package-advantage {
+            padding: 60px 20px;
+            background: linear-gradient(135deg, rgba(212,165,116,0.1) 0%, rgba(212,165,116,0.02) 100%);
+            border-radius: 30px;
+            margin: 40px 20px;
+        }
+        
+        .advantage-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .advantage-item {
+            text-align: center;
+            padding: 25px;
+        }
+        
+        .advantage-item i {
+            font-size: 48px;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+        }
+        
+        .advantage-item h4 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+        }
+        
+        .advantage-item p {
+            font-size: 14px;
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+        
+        /* Преимущества */
+        .advantages-section {
+            padding: 80px 0;
+        }
+        
+        .advantages-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .advantage-card {
+            text-align: center;
+            padding: 30px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .advantage-card:hover {
+            background: rgba(212,165,116,0.05);
+            transform: translateY(-5px);
+        }
+        
+        .advantage-icon {
+            font-size: 48px;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+        }
+        
+        .advantage-card h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: var(--accent-color);
+        }
+        
+        .advantage-card p {
+            font-size: 14px;
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+        
+        /* Этапы работы */
+        .steps-section {
+            padding: 80px 0;
+            background: rgba(212,165,116,0.05);
+        }
+        
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .step-card {
+            text-align: center;
+            position: relative;
+            padding: 20px;
+        }
+        
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 auto 20px;
+        }
+        
+        .step-card h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+        }
+        
+        .step-card p {
+            font-size: 14px;
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+        
+        /* Модальное окно */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--bg-color);
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid var(--accent-color);
+            position: relative;
+        }
+        
+        .modal-content h3 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--accent-color);
+            text-align: center;
+        }
+        
+        .modal-content input,
+        .modal-content textarea {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-color);
+            font-size: 14px;
+            font-family: var(--font-main);
+        }
+        
+        .modal-content input:focus,
+        .modal-content textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+        
+        .modal-content button {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-content button:hover {
+            background: var(--accent-hover);
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--accent-color);
+            transition: all 0.3s ease;
+        }
+        
+        .close-modal:hover {
+            transform: rotate(90deg);
+        }
+        
+        /* Анимации */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* ===== МОБИЛЬНАЯ АДАПТАЦИЯ ТОЛЬКО ЧЕРЕЗ MEDIA ===== */
+        
+        /* Планшеты (768px - 1024px) */
+        @media screen and (min-width: 768px) and (max-width: 1024px) {
+            .services-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+            
+            .pricing-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+            
+            .advantage-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+            
+            .advantages-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 20px;
+            }
+            
+            .steps-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+            
+            .interior-hero-title {
+                font-size: 42px;
+            }
+            
+            .interior-hero-subtitle {
+                font-size: 18px;
+            }
+        }
+        
+        /* Мобильные устройства (до 767px) - ТОЛЬКО ЗДЕСЬ МЕНЯЕМ ФОРМАТ */
+        @media screen and (max-width: 767px) {
+            /* Hero */
+            .interior-hero {
+                min-height: 550px;
+                height: 85vh;
+            }
+            
+            .interior-hero-title {
+                font-size: 32px;
+            }
+            
+            .interior-hero-subtitle {
+                font-size: 14px;
+                margin-bottom: 25px;
+            }
+            
+            .interior-hero-btn {
+                padding: 12px 28px;
+                font-size: 14px;
+            }
+            
+            /* Before After */
+            .before-after-section {
+                padding: 40px 15px;
+            }
+            
+            .section-title {
+                font-size: 28px;
+            }
+            
+            .section-subtitle {
+                font-size: 14px;
+                margin-bottom: 30px;
+            }
+            
+            .slider-handle::before {
+                width: 35px;
+                height: 35px;
+            }
+            
+            .slider-handle::after {
+                font-size: 10px;
+            }
+            
+            .slider-caption p {
+                font-size: 12px;
+            }
+            
+            /* Услуги - 2 колонки на мобильных */
+            .services-section {
+                padding: 40px 15px;
+            }
+            
+            .services-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+                margin-top: 25px;
+            }
+            
+            .service-card {
+                padding: 18px 12px;
+            }
+            
+            .service-icon {
+                font-size: 32px;
+                margin-bottom: 10px;
+            }
+            
+            .service-card h3 {
+                font-size: 15px;
+                margin-bottom: 6px;
+            }
+            
+            .service-card p {
+                font-size: 11px;
+            }
+            
+            /* Прайс-лист - 1 колонка на мобильных */
+            .pricing-section {
+                padding: 40px 15px;
+            }
+            
+            .pricing-type {
+                margin-bottom: 35px;
+            }
+            
+            .pricing-type-title {
+                font-size: 24px;
+                margin-bottom: 25px;
+            }
+            
+            .pricing-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .pricing-card {
+                padding: 20px 18px;
+            }
+            
+            .pricing-card h3 {
+                font-size: 22px;
+                margin-top: 8px;
+            }
+            
+            .pricing-price {
+                font-size: 32px;
+            }
+            
+            .pricing-price span {
+                font-size: 13px;
+            }
+            
+            .pricing-features li {
+                font-size: 12px;
+                padding: 8px 0;
+            }
+            
+            .pricing-time {
+                font-size: 11px;
+                padding: 8px;
+                margin: 12px 0;
+            }
+            
+            .pricing-advantage {
+                font-size: 11px;
+                padding: 10px;
+                margin: 12px 0;
+            }
+            
+            .pricing-btn {
+                padding: 12px;
+                font-size: 14px;
+            }
+            
+            /* Преимущества пакетной цены - 2 колонки */
+            .package-advantage {
+                padding: 35px 15px;
+                margin: 25px 15px;
+                border-radius: 20px;
+            }
+            
+            .advantage-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+                margin-top: 25px;
+            }
+            
+            .advantage-item {
+                padding: 15px 10px;
+            }
+            
+            .advantage-item i {
+                font-size: 32px;
+                margin-bottom: 10px;
+            }
+            
+            .advantage-item h4 {
+                font-size: 14px;
+                margin-bottom: 5px;
+            }
+            
+            .advantage-item p {
+                font-size: 11px;
+            }
+            
+            /* Преимущества - 3 колонки на мобильных */
+            .advantages-section {
+                padding: 40px 15px;
+            }
+            
+            .advantages-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+                margin-top: 25px;
+            }
+            
+            .advantage-card {
+                padding: 15px 8px;
+            }
+            
+            .advantage-icon {
+                font-size: 28px;
+                margin-bottom: 8px;
+            }
+            
+            .advantage-card h3 {
+                font-size: 12px;
+                margin-bottom: 5px;
+            }
+            
+            .advantage-card p {
+                font-size: 9px;
+                line-height: 1.3;
+            }
+            
+            /* Этапы работы - 2 колонки */
+            .steps-section {
+                padding: 40px 15px;
+            }
+            
+            .steps-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+                margin-top: 25px;
+            }
+            
+            .step-card {
+                padding: 15px 10px;
+            }
+            
+            .step-number {
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+                margin-bottom: 12px;
+            }
+            
+            .step-card h3 {
+                font-size: 14px;
+                margin-bottom: 5px;
+            }
+            
+            .step-card p {
+                font-size: 11px;
+            }
+            
+            /* Модальное окно */
+            .modal-content {
+                padding: 25px 20px;
+                max-width: 380px;
+            }
+            
+            .modal-content h3 {
+                font-size: 20px;
+            }
+            
+            .close-modal {
+                top: 12px;
+                right: 18px;
+                font-size: 24px;
+            }
+        }
+        
+        /* Очень маленькие экраны (до 480px) */
+        @media screen and (max-width: 480px) {
+            .services-grid {
+                gap: 10px;
+            }
+            
+            .service-card {
+                padding: 15px 10px;
+            }
+            
+            .service-icon {
+                font-size: 28px;
+            }
+            
+            .service-card h3 {
+                font-size: 13px;
+            }
+            
+            .service-card p {
+                font-size: 10px;
+            }
+            
+            .advantages-grid {
+                gap: 8px;
+            }
+            
+            .advantage-card {
+                padding: 12px 6px;
+            }
+            
+            .advantage-icon {
+                font-size: 24px;
+            }
+            
+            .advantage-card h3 {
+                font-size: 11px;
+            }
+            
+            .advantage-card p {
+                font-size: 8px;
+            }
+            
+            .steps-grid {
+                gap: 12px;
+            }
+            
+            .step-card {
+                padding: 12px 8px;
+            }
+            
+            .step-number {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+            
+            .step-card h3 {
+                font-size: 13px;
+            }
+            
+            .step-card p {
+                font-size: 10px;
+            }
+        }
+        
+        @media (hover: none) and (pointer: coarse) {
+            .slider-handle {
+                width: 6px;
+            }
+            
+            .slider-handle::before {
+                width: 50px;
+                height: 50px;
+            }
+        }
+        
+        /* Оптимизация изображений */
+        img {
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+        
+        .before-after-slider img {
+            object-fit: cover;
+            object-position: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== HEADER ===== -->
+    <header class="main-header">
+        <div class="container header-content">
+            <div class="logo-section">
+                <a href="/" style="text-decoration: none; display: flex; align-items: center;">
+                    <img src="/static/images/logo.png" alt="Respect Home" class="main-logo">
+                </a>
+            </div>
+
+            <nav class="desktop-nav">
+                <ul class="nav-menu">
+                    <li><a href="/">Главная</a></li>
+                    <li><a href="/novostroy">Объекты</a></li>
+                    <li><a href="/about">О нас</a></li>
+                    <li><a href="/contacts">Контакты</a></li>
+                    <li><a href="/admin">Панель управления</a></li>
+                </ul>
+            </nav>
+
+            <div class="header-actions">
+                <div class="contact-info">
+                    <a href="tel:+905554332396" class="phone">+90 554 332 33 96</a>
+                </div>
+                
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Меню">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Мобильное меню -->
+    <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+    <nav class="mobile-nav" id="mobileNav">
+        <div class="mobile-nav-links">
+            <a href="/" class="nav-link">Главная</a>
+            <a href="/novostroy" class="nav-link">Объекты</a>
+            <a href="/about" class="nav-link">О нас</a>
+            <a href="/contacts" class="nav-link">Контакты</a>
+            <a href="/admin" class="nav-link">Панель управления</a>
+        </div>
+        <div class="mobile-contact-info">
+            <p>📞 Связаться</p>
+            <a href="tel:+905543323396">+90 554 332 33 96</a>
+            <p style="margin-top: 15px;">✉️ Почта</p>
+            <a href="mailto:anastasiiainvestor@gmail.com">anastasiiainvestor@gmail.com</a>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="interior-hero">
+            <div class="hero-overlay"></div>
+            <div class="interior-hero-content">
+                <h1 class="interior-hero-title">Создаем интерьеры, в которых хочется жить</h1>
+                <p class="interior-hero-subtitle">Дизайнерский ремонт в Аланье и Анталье: от голых стен до полной меблировки</p>
+                <a href="#" class="interior-hero-btn" id="openModalBtn">Получить консультацию</a>
+            </div>
+        </section>
+
+        <!-- Before After Slider -->
+        <section class="before-after-section">
+            <div class="container">
+                <h2 class="section-title">До и После</h2>
+                <p class="section-subtitle">Посмотрите, как преображаются наши объекты</p>
+                
+                <div class="slider-container">
+                    <div class="before-after-slider" id="slider">
+                        <img src="https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=1200" alt="После" class="after-img" loading="lazy">
+                        <img src="https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg?auto=compress&cs=tinysrgb&w=1200" alt="До" class="before-img" id="beforeImg" loading="lazy">
+                        <div class="slider-handle" id="sliderHandle"></div>
+                    </div>
+                    <div class="slider-caption">
+                        <p>🏠 3 месяца | Полная перепланировка | Подбор мебели и декора</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Что входит в "Под ключ" -->
+        <section class="services-section">
+            <div class="container">
+                <h2 class="section-title">Что входит в «Под ключ»?</h2>
+                <p class="section-subtitle">Никаких скрытых расходов — только прозрачные этапы работ</p>
+                
+                <div class="services-grid">
+                    <div class="service-card">
+                        <div class="service-icon"><i class="fas fa-pencil-ruler"></i></div>
+                        <h3>Дизайн-проект</h3>
+                        <p>Планировка, 3D-визуализация, чертежи для строителей</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon"><i class="fas fa-bolt"></i></div>
+                        <h3>Черновые работы</h3>
+                        <p>Электрика, сантехника, выравнивание стен</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon"><i class="fas fa-paint-roller"></i></div>
+                        <h3>Чистовая отделка</h3>
+                        <p>Покраска, плитка, ламинат, двери</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon"><i class="fas fa-couch"></i></div>
+                        <h3>Комплектация</h3>
+                        <p>Закупка мебели, штор, бытовой техники и декора</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Прайс-лист для 1+1 -->
+        <section class="pricing-section">
+            <div class="container">
+                <div class="pricing-type">
+                    <h2 class="pricing-type-title">🏢 Квартиры 1+1</h2>
+                    <div class="pricing-grid">
+                        <div class="pricing-card">
+                            <div class="pricing-badge">Идеальный старт</div>
+                            <h3>Эконом</h3>
+                            <div class="pricing-price">€10,000<span>/под ключ</span></div>
+                            <div class="pricing-desc">Готово к жизни или сдаче в аренду</div>
+                            
+                            <ul class="pricing-features">
+                                <li><i class="fas fa-check"></i> <strong>Мебель:</strong> Кровать, диван, шкаф-купе, обеденный стол</li>
+                                <li><i class="fas fa-check"></i> <strong>Техника:</strong> Холодильник, стиральная машина, плита, вытяжка</li>
+                                <li><i class="fas fa-check"></i> <strong>Свет:</strong> Полная комплектация светильников</li>
+                                <li><i class="fas fa-check"></i> <strong>Текстиль:</strong> Шторы, постельное белье, полотенца</li>
+                            </ul>
+                            
+                            <div class="pricing-time">
+                                <i class="fas fa-clock"></i> Срок реализации: <strong>2-3 месяца</strong>
+                            </div>
+                            
+                            <div class="pricing-advantage">
+                                <i class="fas fa-chart-line"></i> <strong>Главное преимущество:</strong> Окупаемость за 12-18 месяцев аренды
+                            </div>
+                            
+                            <button class="pricing-btn" onclick="openModalWithPackage('1+1 Эконом', '10000€')">Выбрать пакет</button>
+                        </div>
+                        
+                        <div class="pricing-card luxury">
+                            <div class="pricing-badge">Премиум качество</div>
+                            <h3>Люкс</h3>
+                            <div class="pricing-price">€20,000<span>/под ключ</span></div>
+                            <div class="pricing-desc">Дизайн как в журнале</div>
+                            
+                            <ul class="pricing-features">
+                                <li><i class="fas fa-check"></i> <span class="feature-highlight">Всё из Эконома +</span></li>
+                                <li><i class="fas fa-check"></i> <strong>Премиальная мебель:</strong> Индивидуальный заказ, натуральное дерево</li>
+                                <li><i class="fas fa-check"></i> <strong>Дизайнерский свет:</strong> Брендовые светильники, подсветка</li>
+                                <li><i class="fas fa-check"></i> <strong>Авторский декор:</strong> Картины, вазы, зеркала</li>
+                                <li><i class="fas fa-check"></i> <strong>Умный дом:</strong> Базовые функции автоматизации</li>
+                            </ul>
+                            
+                            <div class="pricing-time">
+                                <i class="fas fa-clock"></i> Срок реализации: <strong>3-4 месяца</strong>
+                            </div>
+                            
+                            <div class="pricing-advantage">
+                                <i class="fas fa-gem"></i> <strong>Главное преимущество:</strong> Повышение стоимости квартиры на 30-40%
+                            </div>
+                            
+                            <button class="pricing-btn" onclick="openModalWithPackage('1+1 Люкс', '20000€')">Выбрать пакет</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Прайс-лист для 2+1 -->
+                <div class="pricing-type">
+                    <h2 class="pricing-type-title">🏠 Квартиры 2+1</h2>
+                    <div class="pricing-grid">
+                        <div class="pricing-card">
+                            <div class="pricing-badge">Семейный уют</div>
+                            <h3>Эконом</h3>
+                            <div class="pricing-price">€20,000<span>/под ключ</span></div>
+                            <div class="pricing-desc">Полная комплектация для семьи</div>
+                            
+                            <ul class="pricing-features">
+                                <li><i class="fas fa-check"></i> <strong>Мебель:</strong> 2 спальни + гостиная (полная мебель)</li>
+                                <li><i class="fas fa-check"></i> <strong>Техника:</strong> Холодильник, стиралка, посудомойка, плита</li>
+                                <li><i class="fas fa-check"></i> <strong>Детская комната:</strong> Кровать, стол, стул</li>
+                                <li><i class="fas fa-check"></i> <strong>Долговечные материалы:</strong> Ламинат 32 класса</li>
+                            </ul>
+                            
+                            <div class="pricing-time">
+                                <i class="fas fa-clock"></i> Срок реализации: <strong>3-4 месяца</strong>
+                            </div>
+                            
+                            <div class="pricing-advantage">
+                                <i class="fas fa-heart"></i> <strong>Главное преимущество:</strong> Идеально для семьи с детьми
+                            </div>
+                            
+                            <button class="pricing-btn" onclick="openModalWithPackage('2+1 Эконом', '20000€')">Выбрать пакет</button>
+                        </div>
+                        
+                        <div class="pricing-card luxury">
+                            <div class="pricing-badge">Эксклюзивный дизайн</div>
+                            <h3>Люкс</h3>
+                            <div class="pricing-price">€40,000<span>/под ключ</span></div>
+                            <div class="pricing-desc">Авторский проект с полным сопровождением</div>
+                            
+                            <ul class="pricing-features">
+                                <li><i class="fas fa-check"></i> <span class="feature-highlight">Всё из Эконома +</span></li>
+                                <li><i class="fas fa-check"></i> <strong>Эксклюзивный дизайн:</strong> Индивидуальная разработка стиля</li>
+                                <li><i class="fas fa-check"></i> <strong>Премиальная техника:</strong> Smeg, Miele, Bosch</li>
+                                <li><i class="fas fa-check"></i> <strong>Полная меблировка террасы:</strong> Садовая мебель, зона барбекю</li>
+                                <li><i class="fas fa-check"></i> <strong>Smart Home:</strong> Полная автоматизация</li>
+                            </ul>
+                            
+                            <div class="pricing-time">
+                                <i class="fas fa-clock"></i> Срок реализации: <strong>4-5 месяцев</strong>
+                            </div>
+                            
+                            <div class="pricing-advantage">
+                                <i class="fas fa-crown"></i> <strong>Главное преимущество:</strong> Резиденция премиум-класса
+                            </div>
+                            
+                            <button class="pricing-btn" onclick="openModalWithPackage('2+1 Люкс', '40000€')">Выбрать пакет</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Преимущества пакетной цены -->
+        <div class="container">
+            <div class="package-advantage">
+                <h2 class="section-title">Почему пакетная цена лучше?</h2>
+                <p class="section-subtitle">Никаких сюрпризов — только честная стоимость</p>
+                
+                <div class="advantage-grid">
+                    <div class="advantage-item">
+                        <i class="fas fa-ban"></i>
+                        <h4>Нет скрытых платежей</h4>
+                        <p>Вы платите фиксированную сумму</p>
+                    </div>
+                    <div class="advantage-item">
+                        <i class="fas fa-chart-line"></i>
+                        <h4>Экономия до 30%</h4>
+                        <p>Оптовые закупки материалов</p>
+                    </div>
+                    <div class="advantage-item">
+                        <i class="fas fa-clock"></i>
+                        <h4>Гарантированные сроки</h4>
+                        <p>Четкий план работ</p>
+                    </div>
+                    <div class="advantage-item">
+                        <i class="fas fa-headset"></i>
+                        <h4>Полное сопровождение</h4>
+                        <p>Вы просто ждете результат</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Почему выбирают нас -->
+        <section class="advantages-section">
+            <div class="container">
+                <h2 class="section-title">Почему стоит выбрать нас?</h2>
+                <p class="section-subtitle">Работаем на результат и дорожим репутацией</p>
+                
+                <div class="advantages-grid">
+                    <div class="advantage-card">
+                        <div class="advantage-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+                        <h3>Фиксированная цена</h3>
+                        <p>Смета не растет в процессе ремонта</p>
+                    </div>
+                    <div class="advantage-card">
+                        <div class="advantage-icon"><i class="fas fa-camera"></i></div>
+                        <h3>Фотоотчеты</h3>
+                        <p>Присылаем отчеты каждую неделю</p>
+                    </div>
+                    <div class="advantage-card">
+                        <div class="advantage-icon"><i class="fas fa-medal"></i></div>
+                        <h3>Гарантия качества</h3>
+                        <p>Отвечаем за качество до 3 лет</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Как мы работаем -->
+        <section class="steps-section">
+            <div class="container">
+                <h2 class="section-title">Как мы работаем</h2>
+                <p class="section-subtitle">Всего 4 простых шага к вашему идеальному интерьеру</p>
+                
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <h3>Заявка и замер</h3>
+                        <p>Бесплатно приедем на объект, сделаем замеры</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <h3>Договор и проект</h3>
+                        <p>Утверждаем стиль, бюджет и сроки</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <h3>Реализация</h3>
+                        <p>Берем все хлопоты на себя</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">4</div>
+                        <h3>Сдача объекта</h3>
+                        <p>Вы заезжаете в готовую квартиру с чемоданами</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Модальное окно -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <span class="close-modal" id="closeModalBtn">&times;</span>
+            <h3>Получить консультацию</h3>
+            <form id="consultationForm">
+                <input type="text" id="packageInfo" name="package" placeholder="Выбранный пакет" readonly style="background: rgba(212,165,116,0.1); border-color: var(--accent-color);">
+                <input type="text" id="userName" name="name" placeholder="Ваше имя" required>
+                <input type="tel" id="userPhone" name="phone" placeholder="Номер телефона" required>
+                <textarea id="userMessage" name="message" rows="3" placeholder="Ваш вопрос"></textarea>
+                <button type="submit">Отправить заявку</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3>Respect Home</h3>
+                    <p>Ведущее агентство по недвижимости в Турции</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Навигация</h3>
+                    <a href="/novostroy">Объекты</a>
+                    <a href="/about">О нас</a>
+                    <a href="/contacts">Контакты</a>
+                </div>
+                <div class="footer-section">
+                    <h3>Социальные сети</h3>
+                    <a href="https://www.tiktok.com/@anastasiia_respect_home">TikTok</a>
+                    <a href="https://www.instagram.com/respect_home_alanya">Instagram</a>
+                    <a href="https://api.whatsapp.com/send/?phone=905543323396">WhatsApp</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="copyright">Copyright © 2025 Respect Home</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Функция для открытия модального окна с выбранным пакетом
+        function openModalWithPackage(packageName, price) {
+            const modalOverlay = document.getElementById('modalOverlay');
+            const packageInfo = document.getElementById('packageInfo');
+            if (packageInfo) {
+                packageInfo.value = `${packageName} — ${price}`;
+            }
+            if (modalOverlay) {
+                modalOverlay.classList.add('active');
+            }
+        }
+        
+        // Отправка данных на почту
+        async function sendToEmail(formData) {
+            const email = 'anastasiiainvestor@gmail.com';
+            const subject = encodeURIComponent(`Новая заявка: ${formData.get('package') || 'Консультация'}`);
+            const body = encodeURIComponent(
+                `Имя: ${formData.get('name')}\n` +
+                `Телефон: ${formData.get('phone')}\n` +
+                `Пакет: ${formData.get('package') || 'Не выбран'}\n` +
+                `Сообщение: ${formData.get('message') || 'Нет'}\n` +
+                `---\nОтправлено с сайта Respect Home (Интерьеры)`
+            );
+            
+            window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Мобильное меню
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const mobileNav = document.getElementById('mobileNav');
+            const mobileNavOverlay = document.getElementById('mobileNavOverlay');
+            
+            if (mobileMenuToggle && mobileNav && mobileNavOverlay) {
+                function toggleMobileMenu() {
+                    mobileMenuToggle.classList.toggle('active');
+                    mobileNav.classList.toggle('active');
+                    mobileNavOverlay.classList.toggle('active');
+                    document.body.classList.toggle('menu-open');
+                }
+                function closeMobileMenu() {
+                    mobileMenuToggle.classList.remove('active');
+                    mobileNav.classList.remove('active');
+                    mobileNavOverlay.classList.remove('active');
+                    document.body.classList.remove('menu-open');
+                }
+                mobileMenuToggle.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); toggleMobileMenu(); });
+                mobileNavOverlay.addEventListener('click', closeMobileMenu);
+                if (mobileNav) {
+                    mobileNav.querySelectorAll('.nav-link').forEach(link => link.addEventListener('click', closeMobileMenu));
+                }
+                window.addEventListener('resize', () => { if (window.innerWidth > 1024) closeMobileMenu(); });
+                document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMobileMenu(); });
+            }
+            
+            // Before After Slider
+            const slider = document.getElementById('slider');
+            const beforeImg = document.getElementById('beforeImg');
+            const handle = document.getElementById('sliderHandle');
+            
+            if (slider && beforeImg && handle) {
+                let isDragging = false;
+                
+                function updateSlider(x) {
+                    const rect = slider.getBoundingClientRect();
+                    let position = (x - rect.left) / rect.width;
+                    position = Math.max(0, Math.min(1, position));
+                    beforeImg.style.clipPath = `inset(0 ${100 - position * 100}% 0 0)`;
+                    handle.style.left = `${position * 100}%`;
+                }
+                
+                function onMouseMove(e) {
+                    if (!isDragging) return;
+                    updateSlider(e.clientX);
+                }
+                
+                function onTouchMove(e) {
+                    if (!isDragging) return;
+                    updateSlider(e.touches[0].clientX);
+                }
+                
+                handle.addEventListener('mousedown', (e) => {
+                    isDragging = true;
+                    e.preventDefault();
+                });
+                window.addEventListener('mousemove', onMouseMove);
+                window.addEventListener('mouseup', () => { isDragging = false; });
+                
+                handle.addEventListener('touchstart', (e) => {
+                    isDragging = true;
+                    e.preventDefault();
+                });
+                window.addEventListener('touchmove', onTouchMove);
+                window.addEventListener('touchend', () => { isDragging = false; });
+            }
+            
+            // Модальное окно
+            const modalOverlay = document.getElementById('modalOverlay');
+            const openModalBtn = document.getElementById('openModalBtn');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            
+            function openModal() {
+                if (modalOverlay) modalOverlay.classList.add('active');
+            }
+            
+            function closeModal() {
+                if (modalOverlay) modalOverlay.classList.remove('active');
+            }
+            
+            if (openModalBtn) openModalBtn.addEventListener('click', openModal);
+            if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
+            
+            if (modalOverlay) {
+                modalOverlay.addEventListener('click', (e) => {
+                    if (e.target === modalOverlay) closeModal();
+                });
+            }
+            
+            // Форма с отправкой на почту
+            const consultationForm = document.getElementById('consultationForm');
+            if (consultationForm) {
+                consultationForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(consultationForm);
+                    const name = formData.get('name');
+                    const phone = formData.get('phone');
+                    
+                    if (!name || !phone) {
+                        alert('Пожалуйста, заполните имя и телефон');
+                        return;
+                    }
+                    
+                    sendToEmail(formData);
+                    
+                    alert('Спасибо! Заявка отправлена. Наш менеджер свяжется с вами в ближайшее время.');
+                    closeModal();
+                    consultationForm.reset();
+                    
+                    if (document.getElementById('packageInfo')) {
+                        document.getElementById('packageInfo').value = '';
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

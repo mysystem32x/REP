@@ -38,8 +38,8 @@ class Property(db.Model):
     area = db.Column(db.Float, nullable=False)
     bedrooms = db.Column(db.Integer, nullable=False)
     bathrooms = db.Column(db.Integer, nullable=False)
-    property_type = db.Column(db.String(100), nullable=False)
-    category = db.Column(db.String(50), nullable=False)
+    property_type = db.Column(db.String(100), nullable=False)  # Вилла, Квартира, Студия и т.д.
+    category = db.Column(db.String(50), nullable=False)  # новостройки, вторичка, аренда
     image = db.Column(db.String(500), nullable=False)
     additional_images = db.Column(db.Text)
     description = db.Column(db.Text)
@@ -53,7 +53,7 @@ class Property(db.Model):
             'id': self.id,
             'name': self.name,
             'location': self.location,
-            'youtube_url': self.youtube_url,  # ✅ Добавлено в экспорт
+            'youtube_url': self.youtube_url,
             'price': self.price,
             'currency': self.currency,
             'area': self.area,
@@ -144,15 +144,63 @@ def init_db():
 @app.route('/')
 def index():
     categories = [
-        {"name": "Новостройки", "slug": "новостройки", "image": "https://img.prian.ru/2024_04/2/202404020444311663427750o.jpg"},
-        {"name": "Вторичка", "slug": "вторичка", "image": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=400&auto=format&fit=crop"},
-        {"name": "Инвестиции", "slug": "инвестиции", "image": "https://img.freepik.com/premium-photo/growth-business-finance-success-graph-stock-profit-investment-3d-financial-chart-market-background-with-economy-money-currency-increase-banki ng-progress-strategy-rise-up-arrow-global-economic_79161-2822.jpg"},
+        {"name": "Новостройки", "slug": "новостройки", "image": "/static/images/новостройка.png"},
+        {"name": "Вторичка", "slug": "вторичка", "image": "/static/images/vtorichka.png"},
+        {"name": "Аренда", "slug": "аренда", "image": "/static/images/arenda.png"},
+        {"name": "Гражданство", "slug": "гражданство", "image": "/static/images/passport.png"},
+        {"name": "ВНЖ", "slug": "внж", "image": "/static/images/vng.png"},
+        {"name": "Интерьер под ключ", "slug": "интерьер", "image": "/static/images/interier.png"},
+        {"name": "Досуг в Алании", "slug": "отдых", "image": "/static/images/ДАСУГ1.png"},
     ]
     return render_template('index.html', categories=categories)
 
 
+# ===== РАЗДЕЛЬНЫЕ МАРШРУТЫ ДЛЯ КАТЕГОРИЙ =====
+
+@app.route('/novostroy')
+def novostroy():
+    """Новостройки - все объекты с категорией 'новостройки'"""
+    properties = Property.query.filter_by(category='новостройки').all()
+    return render_template('novostroy.html', properties=properties)
+
+
+@app.route('/secondary')
+def secondary():
+    """Вторичка - все объекты с категорией 'вторичка'"""
+    properties = Property.query.filter_by(category='вторичка').all()
+    return render_template('secondary.html', properties=properties)
+
+
+@app.route('/rent')
+def rent():
+    """Аренда - все объекты с категорией 'аренда'"""
+    properties = Property.query.filter_by(category='аренда').all()
+    return render_template('rent.html', properties=properties)
+
+
+@app.route('/passport')
+def passport():
+    """Паспорт - все объекты с категорией 'паспорт'"""
+    properties = Property.query.filter_by(category='гражданство').all()
+    return render_template('passport.html', properties=properties)
+
+@app.route('/vng')
+def vng():
+    """ВНЖ - все объекты с категорией 'ВНЖ'"""
+    properties = Property.query.filter_by(category='внж').all()
+    return render_template('vng.html', properties=properties)
+
+@app.route('/interier')
+def interier():
+    """Интерьер под ключ - все объекты с категорией 'Интерьер'"""
+    properties = Property.query.filter_by(category='интерьер').all()
+    return render_template('interier.html', properties=properties)
+
+
+# Старый маршрут оставляем для обратной совместимости (или можно удалить)
 @app.route('/properties')
 def properties():
+    """Все объекты (для обратной совместимости)"""
     category = request.args.get('category', '')
     query = Property.query
     if category:
@@ -161,12 +209,26 @@ def properties():
     return render_template('properties.html', properties=props, selected_category=category)
 
 
-# ✅ ИСПРАВЛЕНИЕ 2: Синтаксис маршрута
 @app.route('/property/<int:property_id>')
 def property_detail(property_id):
     prop = Property.query.get_or_404(property_id)
-    return render_template('property_detail.html', property=prop)
-
+    
+    # Находим похожие объекты (та же категория, исключая текущий)
+    similar_properties = Property.query.filter(
+        Property.category == prop.category,
+        Property.id != prop.id
+    ).limit(3).all()
+    
+    # Если в той же категории нет, ищем того же типа
+    if not similar_properties:
+        similar_properties = Property.query.filter(
+            Property.property_type == prop.property_type,
+            Property.id != prop.id
+        ).limit(3).all()
+    
+    return render_template('property_detail.html', 
+                         property=prop, 
+                         similar_properties=similar_properties)
 
 @app.route('/about')
 def about():
@@ -178,7 +240,6 @@ def contacts():
     return render_template('contacts.html')
 
 
-# ✅ ИСПРАВЛЕНИЕ 3: Маршрут для файлов с параметром filename
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory(UPLOAD_FOLDER, filename)
@@ -230,13 +291,13 @@ def admin_add_property():
             prop = Property(
                 name=request.form.get('name'),
                 location=request.form.get('location'),
-                youtube_url=request.form.get('youtube_url'),  # ✅ Сохраняем YouTube
+                youtube_url=request.form.get('youtube_url'),
                 price=float(request.form.get('price')),
                 area=float(request.form.get('area')),
                 bedrooms=int(request.form.get('bedrooms')),
                 bathrooms=int(request.form.get('bathrooms')),
                 property_type=request.form.get('type'),
-                category=request.form.get('category'),
+                category=request.form.get('category'),  # ✅ КЛЮЧЕВОЕ ПОЛЕ: новостройки/вторичка/аренда
                 image=main_image,
                 description=request.form.get('description'),
                 features=request.form.get('features'),
@@ -259,7 +320,6 @@ def admin_add_property():
     return render_template('admin/property_form.html')
 
 
-# ✅ ИСПРАВЛЕНИЕ 4: Синтаксис маршрута редактирования
 @app.route('/admin/property/<int:property_id>/edit', methods=['GET', 'POST'])
 def admin_edit_property(property_id):
     if 'admin_id' not in session:
@@ -279,13 +339,13 @@ def admin_edit_property(property_id):
 
             prop.name = request.form.get('name')
             prop.location = request.form.get('location')
-            prop.youtube_url = request.form.get('youtube_url')  # ✅ Обновляем YouTube
+            prop.youtube_url = request.form.get('youtube_url')
             prop.price = float(request.form.get('price'))
             prop.area = float(request.form.get('area'))
             prop.bedrooms = int(request.form.get('bedrooms'))
             prop.bathrooms = int(request.form.get('bathrooms'))
             prop.property_type = request.form.get('type')
-            prop.category = request.form.get('category')
+            prop.category = request.form.get('category')  # ✅ Обновляем категорию
             prop.image = main_image
             prop.description = request.form.get('description')
             prop.features = request.form.get('features')
@@ -308,7 +368,6 @@ def admin_edit_property(property_id):
     return render_template('admin/property_form.html', property=prop)
 
 
-# ✅ ИСПРАВЛЕНИЕ 5: Синтаксис маршрута удаления
 @app.route('/admin/property/<int:property_id>/delete', methods=['POST'])
 def admin_delete_property(property_id):
     if 'admin_id' not in session:
@@ -345,11 +404,29 @@ def api_properties():
 # Error Handlers
 # ==========================================
 
+@app.errorhandler(404)
+def not_found(error):
+    return render_template('404.html'), 404
 
 
-# ✅ ИСПРАВЛЕНИЕ 6: Запуск приложения
+@app.errorhandler(500)
+def internal_error(error):
+    return render_template('500.html'), 500
+
+
+# ==========================================
+# Запуск приложения
+# ==========================================
+
 if __name__ == '__main__':
     init_db()
     print(f"📁 Папка загрузок: {UPLOAD_FOLDER}")
     print(f"🌐 Запуск сервера на порту 8080...")
+    print(f"📋 Доступные маршруты:")
+    print(f"   - Главная: /")
+    print(f"   - Новостройки: /novostroy")
+    print(f"   - Вторичка: /secondary")
+    print(f"   - Аренда: /rent")
+    print(f"   - Все объекты: /properties")
+    print(f"   - Админка: /admin")
     app.run(debug=True, host='0.0.0.0', port=8080)
